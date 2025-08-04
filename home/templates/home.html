@@ -1,0 +1,515 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Prevención de Ahogamientos - Home</title>
+  <link rel="stylesheet" href="https://cdn.bokeh.org/bokeh/release/bokeh-3.7.3.min.css">
+  <script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.7.3.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.plot.ly/plotly-3.0.0.min.js">
+  <script src="https://cdn.plot.ly/plotly-3.0.0.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="{% static 'styles/home.js' %}?v={{ now|date:'U' }}"></script>
+  <link rel="stylesheet" href="{% static 'styles/home.css' %}?v={{ now|date:'U' }}">
+</head>
+<body>
+  <header>
+    <h1>Prevención de Ahogamientos</h1>
+    <p class="subtitulo">El cambio empieza con la concienciación</p>
+    <p class="descripcion">
+      Expertos y referencia científica en Ahogamientos en España. Un proyecto de investigación promovido por la Escuela Segoviana de Socorrismo.
+    </p>
+  </header>
+  <div class="layout-flex">
+    <!-- Columna izquierda: selector de gráficas -->
+    <div class="selector-graficas">
+      <h3>Selecciona tipo de gráfica</h3>
+      <ul>
+        <li><button id="btn-grafica-apilada" type="button" class="active">Gráfica apilada</button></li>
+        <li><button id="btn-grafica-circular" type="button">Gráfica circular</button></li>
+        <li><button id="btn-grafica-lineas" type="button">Gráfica de líneas</button></li>
+        <li><button id="btn-diagrama-dispersion" type="button">Diagrama de dispersión</button></li>
+        <li><button id="btn-mapa" type="button">Mapa de España</button></li>
+        <li><button id="btn-histograma" type="button">Histograma</button></li>
+        <li><button id="btn-radar" type="button">Gráfica de radar</button></li>
+      </ul>
+    </div>
+
+    <!-- Columna central: recuadro blanco para las gráficas -->
+    <div class="contenedor-grafica">
+      <div class="configuracion-grafica" id="configPanel">
+        <div id="filtros-apilada" class="config-group">
+          <label>Comunidades Autónomas:</label>
+          <div class="multi-select" id="com-multiselect">
+            <div class="multi-select-header" id="com-header">Selecciona comunidades</div>
+            <div class="multi-select-options" id="com-options">
+                <div class="multi-select-option"><input type="checkbox" value="Andalucía"> Andalucía</div>
+                <div class="multi-select-option"><input type="checkbox" value="Aragón"> Aragón</div>
+                <div class="multi-select-option"><input type="checkbox" value="Asturias"> Asturias</div>
+                <div class="multi-select-option"><input type="checkbox" value="Cantabria"> Cantabria</div>
+                <div class="multi-select-option"><input type="checkbox" value="Castilla y León"> Castilla y León</div>
+                <div class="multi-select-option"><input type="checkbox" value="Castilla-La Mancha"> Castilla-La Mancha</div>
+                <div class="multi-select-option"><input type="checkbox" value="Cataluña"> Cataluña</div>
+                <div class="multi-select-option"><input type="checkbox" value="Ceuta"> Ceuta</div>
+                <div class="multi-select-option"><input type="checkbox" value="Comunidad Valenciana"> Comunidad Valenciana</div>
+                <div class="multi-select-option"><input type="checkbox" value="Comunidad de Madrid"> Comunidad de Madrid</div>
+                <div class="multi-select-option"><input type="checkbox" value="Extremadura"> Extremadura</div>
+                <div class="multi-select-option"><input type="checkbox" value="Galicia"> Galicia</div>
+                <div class="multi-select-option"><input type="checkbox" value="Islas Baleares"> Islas Baleares</div>
+                <div class="multi-select-option"><input type="checkbox" value="Islas Canarias"> Islas Canarias</div>
+                <div class="multi-select-option"><input type="checkbox" value="La Rioja"> La Rioja</div>
+                <div class="multi-select-option"><input type="checkbox" value="Melilla"> Melilla</div>
+                <div class="multi-select-option"><input type="checkbox" value="Navarra"> Navarra</div>
+                <div class="multi-select-option"><input type="checkbox" value="País Vasco"> País Vasco</div>
+                <div class="multi-select-option"><input type="checkbox" value="Región de Murcia"> Región de Murcia</div>
+            </div>
+            <div class="multi-select-pills" id="com-pills"></div>
+          </div>
+
+          <label>Provincias:</label>
+          <div class="multi-select" id="prov-multiselect">
+            <div class="multi-select-header" id="prov-header">Selecciona provincias</div>
+            <div class="multi-select-options" id="prov-options">
+                <div class="multi-select-option"><input type="checkbox" value="A Coruña"> A Coruña</div>
+                <div class="multi-select-option"><input type="checkbox" value="Álava"> Álava</div>
+                <div class="multi-select-option"><input type="checkbox" value="Albacete"> Albacete</div>
+                <div class="multi-select-option"><input type="checkbox" value="Alicante"> Alicante</div>
+                <div class="multi-select-option"><input type="checkbox" value="Almería"> Almería</div>
+                <div class="multi-select-option"><input type="checkbox" value="Asturias"> Asturias</div>
+                <div class="multi-select-option"><input type="checkbox" value="Ávila"> Ávila</div>
+                <div class="multi-select-option"><input type="checkbox" value="Badajoz"> Badajoz</div>
+                <div class="multi-select-option"><input type="checkbox" value="Barcelona"> Barcelona</div>
+                <div class="multi-select-option"><input type="checkbox" value="Burgos"> Burgos</div>
+                <div class="multi-select-option"><input type="checkbox" value="Cáceres"> Cáceres</div>
+                <div class="multi-select-option"><input type="checkbox" value="Cádiz"> Cádiz</div>
+                <div class="multi-select-option"><input type="checkbox" value="Cantabria"> Cantabria</div>
+                <div class="multi-select-option"><input type="checkbox" value="Castellón"> Castellón</div>
+                <div class="multi-select-option"><input type="checkbox" value="Ceuta"> Ceuta</div>
+                <div class="multi-select-option"><input type="checkbox" value="Ciudad Real"> Ciudad Real</div>
+                <div class="multi-select-option"><input type="checkbox" value="Córdoba"> Córdoba</div>
+                <div class="multi-select-option"><input type="checkbox" value="Cuenca"> Cuenca</div>
+                <div class="multi-select-option"><input type="checkbox" value="Gerona"> Gerona</div>
+                <div class="multi-select-option"><input type="checkbox" value="Gipuzkoa"> Gipuzkoa</div>
+                <div class="multi-select-option"><input type="checkbox" value="Granada"> Granada</div>
+                <div class="multi-select-option"><input type="checkbox" value="Guadalajara"> Guadalajara</div>
+                <div class="multi-select-option"><input type="checkbox" value="Huelva"> Huelva</div>
+                <div class="multi-select-option"><input type="checkbox" value="Huesca"> Huesca</div>
+                <div class="multi-select-option"><input type="checkbox" value="Islas Baleares"> Islas Baleares</div>
+                <div class="multi-select-option"><input type="checkbox" value="Jaén"> Jaén</div>
+                <div class="multi-select-option"><input type="checkbox" value="La Rioja"> La Rioja</div>
+                <div class="multi-select-option"><input type="checkbox" value="Las Palmas"> Las Palmas</div>
+                <div class="multi-select-option"><input type="checkbox" value="León"> León</div>
+                <div class="multi-select-option"><input type="checkbox" value="Lleida"> Lleida</div>
+                <div class="multi-select-option"><input type="checkbox" value="Lugo"> Lugo</div>
+                <div class="multi-select-option"><input type="checkbox" value="Madrid"> Madrid</div>
+                <div class="multi-select-option"><input type="checkbox" value="Málaga"> Málaga</div>
+                <div class="multi-select-option"><input type="checkbox" value="Melilla"> Melilla</div>
+                <div class="multi-select-option"><input type="checkbox" value="Murcia"> Murcia</div>
+                <div class="multi-select-option"><input type="checkbox" value="Navarra"> Navarra</div>
+                <div class="multi-select-option"><input type="checkbox" value="Ourense"> Ourense</div>
+                <div class="multi-select-option"><input type="checkbox" value="Palencia"> Palencia</div>
+                <div class="multi-select-option"><input type="checkbox" value="Pontevedra"> Pontevedra</div>
+                <div class="multi-select-option"><input type="checkbox" value="Salamanca"> Salamanca</div>
+                <div class="multi-select-option"><input type="checkbox" value="Santa Cruz de Tenerife"> Santa Cruz de Tenerife</div>
+                <div class="multi-select-option"><input type="checkbox" value="Segovia"> Segovia</div>
+                <div class="multi-select-option"><input type="checkbox" value="Sevilla"> Sevilla</div>
+                <div class="multi-select-option"><input type="checkbox" value="Soria"> Soria</div>
+                <div class="multi-select-option"><input type="checkbox" value="Tarragona"> Tarragona</div>
+                <div class="multi-select-option"><input type="checkbox" value="Teruel"> Teruel</div>
+                <div class="multi-select-option"><input type="checkbox" value="Toledo"> Toledo</div>
+                <div class="multi-select-option"><input type="checkbox" value="Valencia"> Valencia</div>
+                <div class="multi-select-option"><input type="checkbox" value="Valladolid"> Valladolid</div>
+                <div class="multi-select-option"><input type="checkbox" value="Vizcaya"> Vizcaya</div>
+                <div class="multi-select-option"><input type="checkbox" value="Zamora"> Zamora</div>
+                <div class="multi-select-option"><input type="checkbox" value="Zaragoza"> Zaragoza</div>
+            </div>
+            <div class="multi-select-pills" id="prov-pills"></div>
+          </div>
+
+          <!-- Selector de años -->
+          <label>Año:</label>
+          <input type="number" id="anio" placeholder="Ej: 2022" min="2013">
+
+          <label class="switch-label">
+            <input type="checkbox" id="color-sexo-switch">
+            <span class="switch-slider"></span>
+            Filtrar por sexo
+          </label>
+
+          <label class="switch-label">
+            <input type="checkbox" id="mortal-switch">
+            <span class="switch-slider"></span>
+            Solo mortales
+          </label>
+
+          <!-- Puedes ponerlo en cualquier parte del HTML, normalmente cerca de los filtros o los botones -->
+          <form id="dummy-form" style="display:none;">{% csrf_token %}</form>
+
+          <!-- Botones de acción -->
+          <div class="botones-accion">
+            <button type="button" class="btn-generar" id="btn-generar-grafica-apilada">Generar gráfica</button>
+            <button type="button" class="btn-limpiar" id="btn-limpiar-grafica-apilada">Limpiar filtros</button>
+          </div>
+        </div>
+
+        <div id="filtros-circular" class="config-group" style="display:none;">
+          <label for="select-nacionalidad">Nacionalidad:</label>
+          <div class="multi-select" id="nacionalidad-multiselect">
+              <div class="multi-select-header" id="nacionalidad-header">Selecciona nacionalidad</div>
+              <div class="multi-select-options" id="nacionalidad-options">
+                  <div class="multi-select-option"><input type="checkbox" value="Todas" id="nac-todas">Todas</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Alemania">Alemania</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Andorra">Andorra</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Angola">Angola</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Argentina">Argentina</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Argelia">Argelia</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Arabia Saudí">Arabia Saudí</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Asiatico">Asiatico</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Australia">Australia</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Austria">Austria</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Bélgica">Bélgica</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Bolivia">Bolivia</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Brasil">Brasil</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Bulgaria">Bulgaria</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Burkina Faso">Burkina Faso</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Cabo Verde">Cabo Verde</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Camerún">Camerún</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Canadá">Canadá</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Chequia">Chequia</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Chile">Chile</div>
+                  <div class="multi-select-option"><input type="checkbox" value="China">China</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Colombia">Colombia</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Corea">Corea</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Corea del Sur">Corea del Sur</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Costa de Marfil">Costa de Marfil</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Croacia">Croacia</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Cuba">Cuba</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Dinamarca">Dinamarca</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Ecuador">Ecuador</div>
+                  <div class="multi-select-option"><input type="checkbox" value="El Salvador">El Salvador</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Eslovaquia">Eslovaquia</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Eslovenia">Eslovenia</div>
+                  <div class="multi-select-option"><input type="checkbox" value="España">España</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Estados Unidos">Estados Unidos</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Estonia">Estonia</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Europa del Este">Europa del Este</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Filipinas">Filipinas</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Finlandia">Finlandia</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Francia">Francia</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Georgia">Georgia</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Gambia">Gambia</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Ghana">Ghana</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Guinea">Guinea</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Guinea Bissau">Guinea Bissau</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Guinea Conakry">Guinea Conakry</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Holanda">Holanda</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Honduras">Honduras</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Hungría">Hungría</div>
+                  <div class="multi-select-option"><input type="checkbox" value="India">India</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Indonesia">Indonesia</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Irak">Iraq</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Irán">Irán</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Irlanda">Irlanda</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Israel">Israel</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Italia">Italia</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Japón">Japón</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Kazajistán">Kazajistán</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Letonia">Letonia</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Líbano">Líbano</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Lituania">Lituania</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Luxemburgo">Luxemburgo</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Mali">Mali</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Marruecos">Marruecos</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Mauritania">Mauritania</div>
+                  <div class="multi-select-option"><input type="checkbox" value="México">México</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Moldavia">Moldavia</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Noruega">Noruega</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Nicaragua">Nicaragua</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Nigeria">Nigeria</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Nórdico">Nórdico</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Nueva Zelanda">Nueva Zelanda</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Pakistán">Pakistán</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Panamá">Panamá</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Paraguay">Paraguay</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Países Bajos">Países Bajos</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Perú">Perú</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Polonia">Polonia</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Portugal">Portugal</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Reino Unido">Reino Unido</div>
+                  <div class="multi-select-option"><input type="checkbox" value="R Dominicana">R Dominicana</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Rumanía">Rumanía</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Rusia">Rusia</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Senegal">Senegal</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Serbia">Serbia</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Singapur">Singapur</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Sin datos">Sin datos</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Subsahariano">Subsahariano</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Sudáfrica">Sudáfrica</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Sudamérica">Sudamérica</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Suecia">Suecia</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Suiza">Suiza</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Tunez">Tunez</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Turquía">Turquía</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Ucrania">Ucrania</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Uruguay">Uruguay</div>
+                  <div class="multi-select-option"><input type="checkbox" value="USA">USA</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Venezuela">Venezuela</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Vietnam">Vietnam</div>
+              </div>
+              <div class="multi-select-pills" id="nacionalidad-pills"></div>
+          </div>
+
+          <label for="anio-inicio">Año inicio:</label>
+          <input type="number" id="anio-inicio" min="2013" placeholder="Ej: 2015">
+
+          <label for="anio-fin">Año fin:</label>
+          <input type="number" id="anio-fin" min="2013" placeholder="Ej: 2022">
+
+          <div class="botones-accion">
+            <button id="btn-generar-grafica-circular" class="btn-generar" type="button">Generar gráfica</button>
+            <button id="btn-limpiar-grafica-circular" class="btn-limpiar" type="button">Limpiar filtros</button>
+          </div>
+        </div>
+
+        <div id="filtros-lineas" class="config-group" style="display:none;">
+            <label for="anio-linea">Año:</label>
+            <input type="number" id="anio-lineas" min="2013" placeholder="Ej: 2015">
+
+            <label class="switch-label">
+              <input type="checkbox" id="mortal-switch-lineas">
+              <span class="switch-slider"></span>
+              Solo mortales
+            </label>
+
+          <div class="botones-accion">
+            <button id="btn-generar-grafica-lineas" class="btn-generar" type="button">Generar gráfica</button>
+            <button id="btn-limpiar-grafica-lineas" class="btn-limpiar" type="button">Limpiar filtros</button>
+          </div>
+        </div>
+
+        <div id="filtros-dispersion" class="config-group" style="display:none;">
+          <label class="switch-label">
+            <input type="checkbox" id="color-sexo-switch-dispersion">
+            <span class="switch-slider"></span>
+            Filtrar por sexo
+          </label>
+
+          <label class="switch-label">
+            <input type="checkbox" id="mortal-switch-dispersion">
+            <span class="switch-slider"></span>
+            Solo mortales
+          </label> 
+
+          <label class="switch-label">
+            <input type="checkbox" id="linea-dispersion">
+            <span class="switch-slider"></span>
+            Con linea de progresión
+          </label> 
+
+          <div class="botones-accion">
+            <button id="btn-generar-diagrama-dispersion" class="btn-generar" type="button">Generar diagrama</button>
+            <button id="btn-limpiar-diagrama-dispersion" class="btn-limpiar" type="button">Limpiar filtros</button>
+          </div>
+        </div>
+
+        <div id="filtros-mapa" class="config-group" style="display:none;">
+          <label for="select-lugar">Lugar:</label>
+          <div class="multi-select-lugar" id="lugar-multiselect">
+              <div class="multi-select-header" id="lugar-header">Selecciona lugar</div>
+              <div class="multi-select-options" id="lugar-options">
+                  <div class="multi-select-option"><input type="checkbox" value="Todos" id="lugar-todas">Todos</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Playa">Playa</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Piscina">Piscina</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Rio">Rio</div>
+                  <div class="multi-select-option"><input type="checkbox" value="EmbalsePantano">Embalse o pantano</div>
+                  <div class="multi-select-option"><input type="checkbox" value="FranjaCosteraAltaMar">Franja costera o alta mar</div>
+              </div>
+              <div class="multi-select-pills" id="lugar-pills"></div>
+          </div>
+
+          <label class="switch-label">
+            <input type="checkbox" id="mortal-switch-mapa">
+            <span class="switch-slider"></span>
+            Solo mortales
+          </label> 
+
+          <div class="botones-accion">
+            <button id="btn-generar-mapa" class="btn-generar" type="button">Generar mapa</button>
+            <button id="btn-limpiar-mapa" class="btn-limpiar" type="button">Limpiar filtros</button>
+          </div>
+        </div>
+
+        <div id="filtros-histograma" class="config-group" style="display:none;">
+          <label for="select-dia">Día de la semana:</label>
+          <div class="multi-select-dia" id="dia-multiselect">
+              <div class="multi-select-header" id="dia-header">Selecciona días</div>
+              <div class="multi-select-options" id="dia-options">
+                  <div class="multi-select-option"><input type="checkbox" value="Todos" id="dia-todos">Todos</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Lunes">Lunes</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Martes">Martes</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Miércoles">Miércoles</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Jueves">Jueves</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Viernes">Viernes</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Sábado">Sábado</div>
+                  <div class="multi-select-option"><input type="checkbox" value="Domingo">Domingo</div>
+              </div>
+              <div class="multi-select-pills" id="dia-pills"></div>
+          </div>
+
+          <label class="switch-label">
+            <input type="checkbox" id="mortal-switch-histograma">
+            <span class="switch-slider"></span>
+            Solo mortales
+          </label> 
+
+          <div class="botones-accion">
+            <button id="btn-generar-histograma" class="btn-generar" type="button">Generar histograma</button>
+            <button id="btn-limpiar-histograma" class="btn-limpiar" type="button">Limpiar filtros</button>
+          </div>
+        </div>
+
+        <div id="filtros-radar" class="config-group" style="display:none;">
+          <label for="select-radar">Filtro a analizar:</label>
+          <div class="multi-select" id="filtro-multiselect">
+            <div class="multi-select-header" id="filtro-header">Selecciona filtro</div>
+            <div class="multi-select-options" id="filtro-options">
+              <div class="multi-select-option"><input type="checkbox" value="actividad">Actividad</div>
+              <div class="multi-select-option"><input type="checkbox" value="deteccion">Detección</div>
+              <div class="multi-select-option"><input type="checkbox" value="riesgo">Riesgo</div>
+              <div class="multi-select-option"><input type="checkbox" value="localizacion">Localización</div>
+              <div class="multi-select-option"><input type="checkbox" value="intervencion">Intervención</div>
+              <div class="multi-select-option"><input type="checkbox" value="zonavigilada">Zona vigilada</div>
+              <div class="multi-select-option"><input type="checkbox" value="causa">Causa</div>
+              <div class="multi-select-option"><input type="checkbox" value="factorriesgo">Factor de riesgo</div>
+              <div class="multi-select-option"><input type="checkbox" value="antecedente">Antecedente</div>
+              <div class="multi-select-option"><input type="checkbox" value="primerinterviniente">Primer interviniente</div>
+              <div class="multi-select-option"><input type="checkbox" value="materialrescate">Material de rescate</div>
+              <div class="multi-select-option"><input type="checkbox" value="extraccion">Extracción</div>
+              <div class="multi-select-option"><input type="checkbox" value="tipoahogamiento">Tipo de ahogamiento</div>
+              <div class="multi-select-option"><input type="checkbox" value="reanimacion">Reanimación</div>
+              <div class="multi-select-option"><input type="checkbox" value="pronostico">Pronóstico</div>
+            </div>
+            <div class="multi-select-pills" id="filtro-pills"></div>
+          </div>
+
+          <div class="botones-accion">
+            <button id="btn-generar-radar" class="btn-generar" type="button">Generar radar</button>
+            <button id="btn-limpiar-radar" class="btn-limpiar" type="button">Limpiar filtros</button>
+          </div>
+        </div>
+
+        <div id="filtros-analisis-auto" class="config-group" style="display:none;">
+          <!-- Multi-select de actividad -->
+          <label>Actividad:</label>
+          <div class="multi-select" id="actividad-multiselect">
+            <div class="multi-select-header" id="actividad-header">Selecciona actividad</div>
+            <div class="multi-select-options" id="actividad-options">
+              <div class="multi-select-option"><input type="checkbox" value="Baño en reposo">Baño en reposo</div>
+              <div class="multi-select-option"><input type="checkbox" value="Buceo recreativo con botella">Buceo recreativo con botella</div>
+              <div class="multi-select-option"><input type="checkbox" value="Actividad cerca del agua">Actividad cerca del agua</div>
+              <div class="multi-select-option"><input type="checkbox" value="Surf-Windsurf-Esqui acuatico-Kyte">Surf/Windsurf/Esquí/Kite</div>
+              <div class="multi-select-option"><input type="checkbox" value="Juegos en el agua">Juegos en el agua</div>
+              <div class="multi-select-option"><input type="checkbox" value="Natación recreativa">Natación recreativa</div>
+              <div class="multi-select-option"><input type="checkbox" value="Pesca desde playa o rocas">Pesca desde playa o rocas</div>
+              <div class="multi-select-option"><input type="checkbox" value="Zambullida">Zambullida</div>
+            </div>
+            <div class="multi-select-pills" id="actividad-pills"></div>
+          </div>
+
+          <!-- Multi-select de localización -->
+          <label>Localización:</label>
+          <div class="multi-select" id="localizacion-multiselect">
+            <div class="multi-select-header" id="localizacion-header">Selecciona localización</div>
+            <div class="multi-select-options" id="localizacion-options">
+              <div class="multi-select-option"><input type="checkbox" value="Playa con vigilancia">Playa con vigilancia</div>
+              <div class="multi-select-option"><input type="checkbox" value="Playa sin vigilancia">Playa sin vigilancia</div>
+              <div class="multi-select-option"><input type="checkbox" value="Piscina pública con vigilancia">Piscina pública con vigilancia</div>
+              <div class="multi-select-option"><input type="checkbox" value="Piscina doméstica o privada">Piscina doméstica o privada</div>
+              <div class="multi-select-option"><input type="checkbox" value="Aguas interiores sin vigilancia">Aguas interiores sin vigilancia</div>
+              <div class="multi-select-option"><input type="checkbox" value="Entorno marino">Entorno marino</div>
+              <div class="multi-select-option"><input type="checkbox" value="Ríos, canales y similares">Ríos/canales</div>
+            </div>
+            <div class="multi-select-pills" id="localizacion-pills"></div>
+          </div>
+
+          <!-- Multi-select simple para zona vigilada -->
+          <label>Zona vigilada:</label>
+          <div class="multi-select" id="zonavigilada-multiselect">
+            <div class="multi-select-header" id="zonavigilada-header">Selecciona opción</div>
+            <div class="multi-select-options" id="zonavigilada-options">
+              <div class="multi-select-option"><input type="checkbox" value="En horario de vigilancia">En horario de vigilancia</div>
+              <div class="multi-select-option"><input type="checkbox" value="Fuera del horario de vigilancia">Fuera del horario de vigilancia</div>
+              <div class="multi-select-option"><input type="checkbox" value="No vigilado">No vigilado</div>
+            </div>
+            <div class="multi-select-pills" id="zonavigilada-pills"></div>
+          </div>
+
+          <!-- Multi-select de riesgo -->
+          <label>Riesgo:</label>
+          <div class="multi-select" id="riesgo-multiselect">
+            <div class="multi-select-header" id="riesgo-header">Selecciona riesgo</div>
+            <div class="multi-select-options" id="riesgo-options">
+              <div class="multi-select-option"><input type="checkbox" value="Excelentes condiciones, entornos cerrados o cubiertos">Excelentes condiciones</div>
+              <div class="multi-select-option"><input type="checkbox" value="Bandera Verde">Bandera Verde</div>
+              <div class="multi-select-option"><input type="checkbox" value="Bandera Amarilla">Bandera Amarilla</div>
+              <div class="multi-select-option"><input type="checkbox" value="Bandera Roja">Bandera Roja</div>
+              <div class="multi-select-option"><input type="checkbox" value="Fuertes/Severas condiciones">Fuertes/Severas condiciones</div>
+            </div>
+            <div class="multi-select-pills" id="riesgo-pills"></div>
+          </div>
+
+          <!-- Multi-select de intervención -->
+          <label>Tipo de intervención:</label>
+          <div class="multi-select" id="intervencion-multiselect">
+            <div class="multi-select-header" id="intervencion-header">Selecciona intervención</div>
+            <div class="multi-select-options" id="intervencion-options">
+              <div class="multi-select-option"><input type="checkbox" value="Asistencia por transeúntes no adiestrados">Transeúntes no adiestrados</div>
+              <div class="multi-select-option"><input type="checkbox" value="Socorristas o personal adiestrado">Socorristas/personas adiestradas</div>
+              <div class="multi-select-option"><input type="checkbox" value="Personal de emergencias">Emergencias / rescate</div>
+            </div>
+            <div class="multi-select-pills" id="intervencion-pills"></div>
+          </div>
+
+          <!-- Input de edad -->
+          <label>Edad:</label>
+          <input type="number" id="edad-caso" name="edad" min="0" max="105" placeholder="Años" style="width:120px; margin-bottom:16px;">
+
+          <!-- Botones de acción -->
+          <div class="botones-accion">
+            <button type="button" class="btn-generar" id="btn-generar-sklearn">Comparar caso</button>
+            <button type="button" class="btn-limpiar" id="btn-limpiar-sklearn">Limpiar filtros</button>
+          </div>
+        </div>
+
+        <div id="filtros-hotspots" class="config-group" style="display:none;">
+          <label for="anio-inicio-hotspots">Año inicio:</label>
+          <input type="number" id="anio-inicio-hotspots" min="2013" placeholder="Ej: 2015">
+
+          <label for="anio-fin-hotspots">Año fin:</label>
+          <input type="number" id="anio-fin-hotspots" min="2013" placeholder="Ej: 2022">
+
+          <div class="botones-accion">
+            <button id="btn-generar-hotspots" class="btn-generar" type="button">Generar mapa</button>
+            <button id="btn-limpiar-hotspots" class="btn-limpiar" type="button">Limpiar filtros</button>
+          </div>
+        </div>
+
+        <div id="grafica-container"></div>
+      </div>     
+    </div>
+    
+    <!-- Columna derecha: selector de scikit-learn -->
+    <div class="selector-graficas">
+      <h3>Selecciona tipo de consulta</h3>
+      <ul>
+        <li><button id="btn-analisis-automático" type="button">Análisis automático</button></li>
+        <li><button id="btn-hotspots" type="button">Detección de puntos calientes</button></li>
+      </ul>
+    </div>
+
+    
+  </div>
+</body>
+</html>
