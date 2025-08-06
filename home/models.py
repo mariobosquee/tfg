@@ -15,6 +15,10 @@ class Actividad(models.Model):
     class Meta:
         managed = False
         db_table = 'Actividad'
+        
+    def __str__(self):
+        return self.nombreactividad
+
 
 
 class Antecedente(models.Model):
@@ -24,6 +28,9 @@ class Antecedente(models.Model):
     class Meta:
         managed = False
         db_table = 'Antecedente'
+
+    def __str__(self):
+        return self.nombreantecedente
 
 
 class Antecedentevictima(models.Model):
@@ -43,6 +50,9 @@ class Ccaa(models.Model):
     class Meta:
         managed = False
         db_table = 'CCAA'
+    
+    def __str__(self):
+        return self.nombreccaa
 
 
 class Causa(models.Model):
@@ -52,6 +62,9 @@ class Causa(models.Model):
     class Meta:
         managed = False
         db_table = 'Causa'
+
+    def __str__(self):
+        return self.nombrecausa
 
 
 class Causavictima(models.Model):
@@ -72,6 +85,9 @@ class Deteccion(models.Model):
         managed = False
         db_table = 'Deteccion'
 
+    def __str__(self):
+        return self.nombredeteccion
+
 
 class Extraccion(models.Model):
     codextraccion = models.AutoField(db_column='codExtraccion', primary_key=True)  # Field name made lowercase.
@@ -81,6 +97,9 @@ class Extraccion(models.Model):
         managed = False
         db_table = 'Extraccion'
 
+    def __str__(self):
+        return self.nombreextraccion
+
 
 class Factorriesgo(models.Model):
     codfactorriesgo = models.AutoField(db_column='codFactorRiesgo', primary_key=True)  # Field name made lowercase.
@@ -89,6 +108,9 @@ class Factorriesgo(models.Model):
     class Meta:
         managed = False
         db_table = 'FactorRiesgo'
+
+    def __str__(self):
+        return self.nombrefactorriesgo
 
 
 class Factorriesgovictima(models.Model):
@@ -130,6 +152,9 @@ class Intervencion(models.Model):
         managed = False
         db_table = 'Intervencion'
 
+    def __str__(self):
+        return self.nombreintervencion
+
 
 class Localidad(models.Model):
     codlocalidad = models.AutoField(db_column='codLocalidad', primary_key=True)  # Field name made lowercase.
@@ -140,6 +165,9 @@ class Localidad(models.Model):
         managed = False
         db_table = 'Localidad'
 
+    def __str__(self):
+        return self.nombrelocalidad
+
 
 class Localizacion(models.Model):
     codlocalizacion = models.AutoField(db_column='codLocalizacion', primary_key=True)  # Field name made lowercase.
@@ -148,6 +176,9 @@ class Localizacion(models.Model):
     class Meta:
         managed = False
         db_table = 'Localizacion'
+
+    def __str__(self):
+        return self.nombrelocalizacion
 
 
 class Materialrescate(models.Model):
@@ -158,6 +189,9 @@ class Materialrescate(models.Model):
         managed = False
         db_table = 'MaterialRescate'
 
+    def __str__(self):
+        return self.nombrematerialrescate
+
 
 class Nacionalidad(models.Model):
     codnacionalidad = models.AutoField(db_column='codNacionalidad', primary_key=True)  # Field name made lowercase.
@@ -166,6 +200,9 @@ class Nacionalidad(models.Model):
     class Meta:
         managed = False
         db_table = 'Nacionalidad'
+
+    def __str__(self):
+        return self.nombrenacionalidad
 
 
 class Origen(models.Model):
@@ -176,6 +213,9 @@ class Origen(models.Model):
         managed = False
         db_table = 'Origen'
 
+    def __str__(self):
+        return self.nombreorigen
+
 
 class Primerinterviniente(models.Model):
     codprimerinterviniente = models.AutoField(db_column='codPrimerInterviniente', primary_key=True)  # Field name made lowercase.
@@ -184,6 +224,9 @@ class Primerinterviniente(models.Model):
     class Meta:
         managed = False
         db_table = 'PrimerInterviniente'
+
+    def __str__(self):
+        return self.nombreprimerinterviniente
 
 
 class Pronostico(models.Model):
@@ -194,6 +237,9 @@ class Pronostico(models.Model):
         managed = False
         db_table = 'Pronostico'
 
+    def __str__(self):
+        return self.nombrepronostico
+
 
 class Provincia(models.Model):
     codprovincia = models.AutoField(db_column='codProvincia', primary_key=True)  # Field name made lowercase.
@@ -203,6 +249,9 @@ class Provincia(models.Model):
     class Meta:
         managed = False
         db_table = 'Provincia'
+
+    def __str__(self):
+        return self.nombreprovincia
 
 
 class Reanimacion(models.Model):
@@ -222,6 +271,9 @@ class Riesgo(models.Model):
         managed = False
         db_table = 'Riesgo'
 
+    def __str__(self):
+        return self.nombreriesgo
+
 
 class Tipoahogamiento(models.Model):
     codtipoahogamiento = models.AutoField(db_column='codTipoAhogamiento', primary_key=True)  # Field name made lowercase.
@@ -230,6 +282,9 @@ class Tipoahogamiento(models.Model):
     class Meta:
         managed = False
         db_table = 'TipoAhogamiento'
+
+    def __str__(self):
+        return self.nombretipoahogamiento
 
 
 class Victima(models.Model):
@@ -258,6 +313,9 @@ class Zonavigilada(models.Model):
     class Meta:
         managed = False
         db_table = 'ZonaVigilada'
+
+    def __str__(self):
+        return self.nombrezonavigilada
 
 
 class AuthGroup(models.Model):

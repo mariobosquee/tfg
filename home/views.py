@@ -174,7 +174,7 @@ def generar_grafica_circular(request):
     if anio_fin < anio_inicio:
         return JsonResponse({'error': 'El año de fin no puede ser inferior al de inicio.'})
     
-    if not nacionalidades or isinstance(anio_inicio, int) or isinstance(anio_fin, int):
+    if not nacionalidades or not anio_inicio or not anio_fin or isinstance(anio_inicio, int) or isinstance(anio_fin, int):
         return JsonResponse({'error': 'Debes seleccionar al menos una nacionalidad y un rango de años válido.'})
 
     filtro = {
@@ -1093,3 +1093,5 @@ def generar_mapa_hotspots(request):
     html_response = f'<div><h3>Hotspots Detectados con Clustering Espacial</h3>{map_div}</div>'
 
     return JsonResponse({'html': html_response, 'clusters': summary.to_dict(orient="records")})
+
+
