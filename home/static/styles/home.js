@@ -38,11 +38,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Asocia cada botón a su filtro, alternando visibilidad y clases
     botones.forEach((btnId, idx) => {
         document.getElementById(btnId).addEventListener('click', function() {
-            // Mostrar el filtro correspondiente, ocultar los demás
             filtros.forEach((filtroId, i) => {
                 document.getElementById(filtroId).style.display = (i === idx) ? 'block' : 'none';
             });
-            // Marcar solo este botón como activo
             botones.forEach((bId, j) => {
                 document.getElementById(bId).classList.toggle('active', j === idx);
             });
@@ -257,16 +255,13 @@ document.addEventListener('DOMContentLoaded', function() {
         let todas = nacOptions.querySelector('input[value="Todas"]');
         let selected = [];
 
-        // ¿Está seleccionada la opción "Todas"?
         if (todas.checked) {
-            // Desmarca y deshabilita todos menos "Todas"
             nacCheckboxes.forEach(cb => {
             if (cb !== todas) {
                 cb.checked = false;
                 cb.disabled = true;
             }
             });
-            // Solo muestra la pill de "Todas"
             const pill = document.createElement('span');
             pill.className = 'pill';
             pill.textContent = 'Todas';
@@ -283,11 +278,8 @@ document.addEventListener('DOMContentLoaded', function() {
             nacHeader.textContent = 'Todas seleccionadas';
             return;
         } else {
-            // Asegura que todo está habilitado si "Todas" NO está marcada
             nacCheckboxes.forEach(cb => cb.disabled = false);
         }
-
-        // Pills para cada nacionalidad seleccionada
         nacCheckboxes.forEach(cb => {
             if (cb.checked && cb.value !== '') {
             selected.push(cb.parentElement.textContent.trim());
@@ -317,9 +309,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Inicializa las pills al cargar por primera vez
     updateNacPills();
 
+    // Botón para generar la gráfica circular
     const btnCircular = document.getElementById('btn-generar-grafica-circular');
     btnCircular.addEventListener('click', function() {
-        // Obtiene seleccionadas las nacionalidades (pueden ser múltiples)
         const nacionalidadChecks = document.querySelectorAll('#nacionalidad-options input[type="checkbox"]:checked');
         const nacionalidades = Array.from(nacionalidadChecks).map(cb => cb.value).filter(v => v !== "");
 
@@ -327,7 +319,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const anioFin = document.getElementById('anio-fin').value;
 
         const formData = new FormData();
-        nacionalidades.forEach(nac => formData.append('nacionalidades[]', nac)); // Múltiples valores
+        nacionalidades.forEach(nac => formData.append('nacionalidades[]', nac)); 
         formData.append('anio_inicio', anioInicio);
         formData.append('anio_fin', anioFin);
 
@@ -359,7 +351,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Botón para limpiar filtros
     const clearGraficaCircular = document.getElementById('btn-limpiar-grafica-circular');
     clearGraficaCircular.addEventListener('click', function() {
-        // Desmarcar TODAS las nacionalidades, dejar solo "Todas" marcada
         document.querySelectorAll('#nacionalidad-options input[type="checkbox"]').forEach(cb => cb.checked = false);
         document.getElementById('anio-inicio').value = '';
         document.getElementById('anio-fin').value = '';
@@ -414,21 +405,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // Botón para limpiar filtros
     const clearDiagramaDispersion = document.getElementById('btn-limpiar-diagrama-dispersion');
     clearDiagramaDispersion.addEventListener('click', function() {
-        // Desmarcar TODAS las nacionalidades, dejar solo "Todas" marcada
         document.getElementById('color-sexo-switch-dispersion').checked = false;
         document.getElementById('mortal-switch-dispersion').checked = false;
         document.getElementById('linea-dispersion').checked = false;
     });
 
+    // Botón para generar el diagrama de dispersión
     const generateDiagramaDispersion = document.getElementById('btn-generar-diagrama-dispersion');
     generateDiagramaDispersion.addEventListener('click', function() {
-        // Captura todos los valores seleccionados como array
         const soloMortales = document.getElementById('mortal-switch-dispersion').checked;
         const filtraSexo = document.getElementById('color-sexo-switch-dispersion').checked;
         const linea = document.getElementById('linea-dispersion').checked;
 
         const formData = new FormData();
-        // Agrega todos los lugares como lista (campo lugares[])
         formData.append('solo_mortales', soloMortales ? 'true' : 'false');
         formData.append('color_sexo', filtraSexo ? 'true' : 'false');
         formData.append('mostrar_linea', linea ? 'true' : 'false');
@@ -486,16 +475,13 @@ document.addEventListener('DOMContentLoaded', function() {
         let todas = lugOptions.querySelector('input[value="Todos"]');
         let selected = [];
 
-        // ¿Está seleccionada la opción "Todos"?
         if (todas.checked) {
-            // Desmarca y deshabilita todos menos "Todos"
             lugCheckboxes.forEach(cb => {
                 if (cb !== todas) {
                     cb.checked = false;
                     cb.disabled = true;
                 }
             });
-            // Solo muestra la pill de "Todos"
             const pill = document.createElement('span');
             pill.className = 'pill';
             pill.textContent = 'Todos';
@@ -512,11 +498,9 @@ document.addEventListener('DOMContentLoaded', function() {
             lugHeader.textContent = 'Todos seleccionados';
             return;
         } else {
-            // Asegura que todos están habilitados si "Todos" NO está marcada
             lugCheckboxes.forEach(cb => cb.disabled = false);
         }
 
-        // Pills para cada lugar seleccionado
         lugCheckboxes.forEach(cb => {
             if (cb.checked && cb.value !== '') {
                 selected.push(cb.parentElement.textContent.trim());
@@ -554,11 +538,11 @@ document.addEventListener('DOMContentLoaded', function() {
         updateLugPills();
     });
     
+    // Botón para generar el mapa
     const generateMapa = document.getElementById('btn-generar-mapa');
     generateMapa.addEventListener('click', function() {
         const soloMortales = document.getElementById('mortal-switch-mapa').checked;
 
-        // Recoge los lugares seleccionados (todas las checkbox marcadas)
         const lugarCheckboxes = document.querySelectorAll('#lugar-options input[type=checkbox]');
         let lugaresSeleccionados = [];
         lugarCheckboxes.forEach(cb => {
@@ -569,7 +553,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const formData = new FormData();
         formData.append('solo_mortales', soloMortales ? 'true' : 'false');
-        // Añade los lugares seleccionados
         lugaresSeleccionados.forEach(lugar => formData.append('lugares[]', lugar));
 
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
@@ -625,16 +608,13 @@ document.addEventListener('DOMContentLoaded', function() {
         let todos = diaOptions.querySelector('input[value="Todos"]');
         let selected = [];
 
-        // ¿Está seleccionada la opción "Todos"?
         if (todos.checked) {
-            // Desmarca y deshabilita todos menos "Todos"
             diaCheckboxes.forEach(cb => {
                 if (cb !== todos) {
                     cb.checked = false;
                     cb.disabled = true;
                 }
             });
-            // Solo muestra la pill de "Todos"
             const pill = document.createElement('span');
             pill.className = 'pill';
             pill.textContent = 'Todos';
@@ -651,11 +631,9 @@ document.addEventListener('DOMContentLoaded', function() {
             diaHeader.textContent = 'Todos seleccionados';
             return;
         } else {
-            // Habilita todos si "Todos" NO está marcada
             diaCheckboxes.forEach(cb => cb.disabled = false);
         }
 
-        // Pills para cada día seleccionado
         diaCheckboxes.forEach(cb => {
             if (cb.checked && cb.value !== '') {
                 selected.push(cb.parentElement.textContent.trim());
@@ -693,12 +671,11 @@ document.addEventListener('DOMContentLoaded', function() {
         updateDiaPills();
     });
 
-    // Generar histograma
+    // Botón para generar el histograma
     const generateHistograma = document.getElementById('btn-generar-histograma');
     generateHistograma.addEventListener('click', function() {
         const soloMortales = document.getElementById('mortal-switch-histograma').checked;
 
-        // Recoge los días seleccionados
         const diaCheckboxes = document.querySelectorAll('#dia-options input[type=checkbox]');
         let diasSeleccionados = [];
         diaCheckboxes.forEach(cb => {
@@ -763,7 +740,6 @@ document.addEventListener('DOMContentLoaded', function() {
         filtroPills.innerHTML = '';
         let selected = [];
 
-        // Permitir solo una selección: si hay uno marcado, deshabilita los demás
         let checked = Array.from(filtroCheckboxes).find(cb => cb.checked);
         filtroCheckboxes.forEach(cb => {
             if (checked && cb !== checked) {
@@ -773,7 +749,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Si hay uno seleccionado, muestra su pill
         if (checked) {
             selected.push(checked.parentElement.textContent.trim());
             const pill = document.createElement('span');
@@ -797,7 +772,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Al cambiar cualquier filtro, actualizar pill única
     filtroCheckboxes.forEach(cb => cb.addEventListener('change', function() {
-        // Al seleccionar uno, desmarcar el resto
         if (this.checked) {
             filtroCheckboxes.forEach(cb2 => {
                 if (cb2 !== this) cb2.checked = false;
@@ -819,10 +793,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Generar radar
     const generateRadar = document.getElementById('btn-generar-radar');
     generateRadar.addEventListener('click', function() {
-        // Solo un filtro permitido
         let filtroSeleccionado = Array.from(filtroCheckboxes).find(cb => cb.checked);
         if (!filtroSeleccionado) {
-            // Muestra error si es necesario aquí
             return;
         }
 
@@ -857,38 +829,41 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // ===== Función para hacer multi-select single-choice =====
+    // Función para hacer multi-select single-choice
     function setSingleChoiceMultiSelect(groupId, updatePillsFunction) {
         const options = document.querySelectorAll(`#${groupId}-options input[type="checkbox"]`);
         options.forEach(cb => {
             cb.addEventListener('change', () => {
                 if (cb.checked) {
-                    // Desmarca todos los demás en el grupo
                     options.forEach(otherCb => {
                         if (otherCb !== cb) otherCb.checked = false;
                     });
                 }
-                // Llama a la función de actualización de pills para refrescar visual
                 if (typeof updatePillsFunction === 'function') updatePillsFunction();
             });
         });
     }
 
-    // ==== Multi-select de Actividad ====
+    // Multi-select de Actividad
     const actividadHeader = document.getElementById('actividad-header');
     const actividadOptions = document.getElementById('actividad-options');
     const actividadPills = document.getElementById('actividad-pills');
     const actividadCheckboxes = actividadOptions.querySelectorAll('input[type="checkbox"]');
 
+    // Abrir/cerrar menú de filtros
     actividadHeader.addEventListener('click', function(e) {
         if (actividadHeader.classList.contains('disabled')) return;
         actividadOptions.classList.toggle('open');
     });
+
+    // Cerrado al hacer click fuera
     document.addEventListener('click', function(e) {
         if (!actividadHeader.contains(e.target) && !actividadOptions.contains(e.target)) {
             actividadOptions.classList.remove('open');
         }
     });
+
+    // Función para actualizar la pill y bloquear para filtro único
     function updateActividadPills() {
         actividadPills.innerHTML = '';
         const selected = [];
@@ -911,12 +886,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         actividadHeader.textContent = selected.length > 0 ? `${selected.length} seleccionada` : 'Selecciona actividad';
     }
+
+    // Al cambiar cualquier filtro, actualizar pill única
     actividadCheckboxes.forEach(cb => cb.addEventListener('change', updateActividadPills));
+
+    // Inicializa la pill/filtro al cargar
     updateActividadPills();
+
+    // Inicializa un selector de elección simple con multiselección para el campo 'actividad'
     setSingleChoiceMultiSelect('actividad', updateActividadPills);
 
 
-    // ==== Multi-select de Localización ====
+    // Multi-select de Localización
     const localizacionHeader = document.getElementById('localizacion-header');
     const localizacionOptions = document.getElementById('localizacion-options');
     const localizacionPills = document.getElementById('localizacion-pills');
@@ -926,11 +907,15 @@ document.addEventListener('DOMContentLoaded', function() {
         if (localizacionHeader.classList.contains('disabled')) return;
         localizacionOptions.classList.toggle('open');
     });
+
+
     document.addEventListener('click', function(e) {
         if (!localizacionHeader.contains(e.target) && !localizacionOptions.contains(e.target)) {
             localizacionOptions.classList.remove('open');
         }
     });
+
+
     function updateLocalizacionPills() {
         localizacionPills.innerHTML = '';
         const selected = [];
@@ -953,8 +938,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         localizacionHeader.textContent = selected.length > 0 ? `${selected.length} seleccionada` : 'Selecciona localización';
     }
+
+
     localizacionCheckboxes.forEach(cb => cb.addEventListener('change', updateLocalizacionPills));
+
+
     updateLocalizacionPills();
+    
     setSingleChoiceMultiSelect('localizacion', updateLocalizacionPills);
 
 

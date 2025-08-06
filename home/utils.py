@@ -30,7 +30,6 @@ def obtener_fecha_incidente(codigo):
     else:
         return resultado[0]
 
-from django.db import connection
 
 def obtener_ahogamientos_por_comunidad(anio, codigos):
     from django.db import connection
