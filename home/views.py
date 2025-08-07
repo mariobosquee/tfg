@@ -30,6 +30,7 @@ from sklearn.cluster import DBSCAN
 def home(request):
     return render(request, 'home.html')
 
+@csrf_exempt
 def generar_grafica_apilada(request):
     comunidades = request.POST.getlist('comunidades[]')
     provincias = request.POST.getlist('provincias[]')
@@ -40,7 +41,6 @@ def generar_grafica_apilada(request):
     if (not comunidades and not provincias) or not anio:
         return JsonResponse({'error': 'Selecciona al menos una comunidad o provincia y un año.'})
 
-    # Definición de campo de agrupación y filtro
     if comunidades:
         codigos = [obtener_codigo("CCAA", comunidad) for comunidad in comunidades]
         agrupacion = 'incidente__localidad__provincia__codccaa__nombreccaa'
@@ -68,7 +68,6 @@ def generar_grafica_apilada(request):
         if df.empty:
             return JsonResponse({'error': 'No hay datos para esos filtros.'})
 
-        # Pivota para obtener columnas 'Hombres' y 'Mujeres'
         df = df.pivot_table(index=agrupacion, columns='sexo', values='Ahogamientos', fill_value=0).reset_index()
 
         nombres = list(df[agrupacion])
@@ -86,7 +85,6 @@ def generar_grafica_apilada(request):
         )
         bar_width = 0.33
 
-        # Barras agrupadas usando dodge
         p.vbar(
             x=dodge(agrupacion, -0.17, range=p.x_range),
             top='Hombre',
@@ -165,6 +163,7 @@ def generar_grafica_apilada(request):
         'grafica_html': f"{resources}\n{script}\n{div}"
     })
 
+@csrf_exempt
 def generar_grafica_circular(request):
     nacionalidades = request.POST.getlist('nacionalidades[]')
     anio_inicio = request.POST.get('anio_inicio')
@@ -224,7 +223,6 @@ def generar_grafica_circular(request):
         ], ignore_index=True)
 
 
-    # Paleta de colores adaptada
     n = len(df_principales)
     palette_raw = Category20c[max(3, min(n, 20))]
     df_principales['color'] = [c for _, c in zip(range(n), cycle(palette_raw))]
@@ -277,7 +275,6 @@ def generar_grafica_circular(request):
     p.legend.click_policy = "hide"
 
 
-    # Añadir info de “Otras” si aplica
     if nacionalidades_otras:
         label = Label(
             x=0, y=0.55, x_units='data', y_units='data',
@@ -294,6 +291,7 @@ def generar_grafica_circular(request):
 
     return JsonResponse({'grafica_html': grafica_html})
 
+@csrf_exempt
 def generar_grafica_lineas(request):
     anio = request.POST.get('anio')
     solo_mortales = request.POST.get('solo_mortales') == 'true'
@@ -301,12 +299,10 @@ def generar_grafica_lineas(request):
     if not anio:
         return JsonResponse({'error': 'Debes seleccionar el año.'})
 
-    # Base de filtro
     filtro = {'incidente__fecha__year': anio}
     if solo_mortales:
         filtro['pronostico__nombrepronostico'] = "Ahogamiento mortal"
 
-    # Query: agrupado por mes
     qs = (
         Victima.objects
         .filter(**filtro)
@@ -320,7 +316,6 @@ def generar_grafica_lineas(request):
     if df.empty:
         return JsonResponse({'error': 'No hay datos para esos filtros.'})
 
-    # Asegura que estén todos los meses (1-12)
     meses = list(range(1,13))
     df = df.set_index('incidente__fecha__month').reindex(meses, fill_value=0).reset_index()
     df.rename(columns={'incidente__fecha__month': 'Mes'}, inplace=True)
@@ -340,11 +335,8 @@ def generar_grafica_lineas(request):
         toolbar_location='right',
         tools="pan,wheel_zoom,box_zoom,reset,save"
     )
-    # Línea de la serie temporal
     p.line(x='MesNombre', y='Ahogamientos', source=source, line_width=3, color="#1976d2")
-    # Puntos destacados
     p.circle(x='MesNombre', y='Ahogamientos', size=8, color="#1976d2", source=source)
-    # Tooltips con cantidad exacta
     hover = HoverTool(
         tooltips=[('Mes', '@MesNombre'), ('Ahogamientos', '@Ahogamientos')],
         mode='vline'
@@ -358,6 +350,7 @@ def generar_grafica_lineas(request):
         'grafica_html': f"{resources}\n{script}\n{div}"
     })
 
+@csrf_exempt
 def generar_diagrama_dispersion(request):
     color_sexo = request.POST.get('color_sexo', 'false') == 'true'
     solo_mortales = request.POST.get('solo_mortales', 'false') == 'true'
@@ -400,7 +393,6 @@ def generar_diagrama_dispersion(request):
         palette = [colores_dict[s] for s in sexos_presentes]
         color_mapper = factor_cmap('Sexo', palette=palette, factors=sexos_presentes)
         legend = 'Sexo'
-        # Solo Edad y Ahogamientos en tooltip
         hover = HoverTool(tooltips=[
             ('Edad', '@Edad{0}'),
             ('Ahogamientos', '@Ahogamientos{0}')
@@ -426,7 +418,6 @@ def generar_diagrama_dispersion(request):
         toolbar_location='right'
     )
 
-    # Solo puntos si la línea NO está activada
     if not mostrar_linea:
         source = ColumnDataSource(df_group)
         scatter_args = dict(
@@ -441,7 +432,6 @@ def generar_diagrama_dispersion(request):
             scatter_args['legend_field'] = legend
         p.scatter(**scatter_args)
 
-    # Solo línea si la línea SÍ está activada
     if mostrar_linea:
         if color_sexo:
             for sexo_valor, color in zip(sexos_presentes, palette):
@@ -495,8 +485,8 @@ def generar_diagrama_dispersion(request):
     resources = CDN.render()
     return JsonResponse({'grafica_html': f"{resources}\n{script}\n{div}"})
 
+@csrf_exempt
 def generar_mapa(request):
-    # --- Recoge filtros ---
     solo_mortales = request.POST.get('solo_mortales', 'false') == 'true'
     lugares = request.POST.getlist('lugares[]')
 
@@ -504,10 +494,8 @@ def generar_mapa(request):
         return JsonResponse({'error': 'Debes seleccionar al menos un lugar'})
 
 
-    # 1. Carga el shapefile de provincias
     gdf = gpd.read_file('C:/Users/Usuario/Desktop/UC/Cuarto_Curso/Segundo Cuatrimestre/TFG/projectAhogamientos/home/data/shapefiles_provincias_espana_actualizado.shp')
 
-    # 2. Mapeo lugares: traduce el filtro del frontend a los nombres de tu BDD
     MAPEO_LUGARES = {
         "Playa": ["Playas con vigilancia", "Playas sin vigilancia"],
         "Piscina": [
@@ -526,14 +514,12 @@ def generar_mapa(request):
     if solo_mortales:
         filtro['pronostico__nombrepronostico'] = "Ahogamiento mortal"
 
-    # Aplica filtro de lugares si NO se elige "Todos" y hay lugares seleccionados
     if lugares and "Todos" not in lugares:
         lugares_bd = []
         for lugar in lugares:
             lugares_bd.extend(MAPEO_LUGARES.get(lugar, []))
         filtro['incidente__localizacion__nombrelocalizacion__in'] = lugares_bd
 
-    # 3. Consulta por provincia
     data = (
         Victima.objects
         .filter(**filtro)
@@ -544,13 +530,10 @@ def generar_mapa(request):
         columns={'incidente__localidad__provincia__nombreprovincia': 'texto_alt'}
     )
 
-    # 4. Une datos al GeoDataFrame
     gdf = gdf.merge(df_stats, on='texto_alt', how='left')
     gdf['Ahogamientos'] = gdf['Ahogamientos'].fillna(0).astype(int)
 
-    # 5. Visualización Bokeh
     geo_source = GeoJSONDataSource(geojson=gdf.to_json())
-    # Recorta la paleta para colores más intensos y evita los rojos pálidos
     palette_red = Reds256[80:][::-1]
 
     mapper = linear_cmap(
@@ -582,7 +565,6 @@ def generar_mapa(request):
     )
     p.add_tools(hover)
 
-    # Añade la barra de colores NUMÉRICA a la derecha
     color_bar = ColorBar(
         color_mapper=mapper['transform'],
         label_standoff=12,
@@ -598,26 +580,24 @@ def generar_mapa(request):
     resources = CDN.render()
     return JsonResponse({'grafica_html': f"{resources}\n{script}\n{div}"})
 
-# Días español-inglés para traducción a weekday (opcionalmente úsalos según tus datos)
-DIAS_NUM = {
-    "Lunes": 2,
-    "Martes": 3,
-    "Miércoles": 4,
-    "Jueves": 5,
-    "Viernes": 6,
-    "Sábado": 7,
-    "Domingo": 1
-}
-
+@csrf_exempt
 def generar_histograma(request):
-    # --- Recoge filtros ---
     solo_mortales = request.POST.get('solo_mortales', 'false') == 'true'
     dias = request.POST.getlist('dias[]')
 
     if not dias:
         return JsonResponse({'error': 'Debes seleccionar al menos un día.'})
+    
+    DIAS_NUM = {
+        "Lunes": 2,
+        "Martes": 3,
+        "Miércoles": 4,
+        "Jueves": 5,
+        "Viernes": 6,
+        "Sábado": 7,
+        "Domingo": 1
+    }
 
-    # Mapea los días seleccionados a los valores Django
     if "Todos" in dias:
         dias_django = list(DIAS_NUM.values())
     else:
@@ -630,7 +610,6 @@ def generar_histograma(request):
     if solo_mortales:
         filtro['pronostico__nombrepronostico'] = "Ahogamiento mortal"
 
-    # 1. Obtiene los registros con hora y fecha no nulos, filtrando por día de la semana y mortalidad
     qs = (
         Victima.objects
         .filter(**filtro)
@@ -642,18 +621,14 @@ def generar_histograma(request):
         .filter(dia_semana__in=dias_django)
     )
 
-    # 2. Extrae manualmente las horas y crea un DataFrame para el conteo
     registros = []
     for v in qs:
         if v.incidente.hora:
             registros.append(v.incidente.hora.hour)
 
-    # 3. Cuenta los ahogamientos por hora
     df_registros = pd.DataFrame(registros, columns=['hora'])
-    # Cuenta ocurrencias por hora
     conteo = df_registros['hora'].value_counts().sort_index()
 
-    # 4. Asegura que hay valores para todas las horas 0-23
     todas_horas = pd.Series(0, index=range(24))
     todas_horas.update(conteo)
 
@@ -662,12 +637,9 @@ def generar_histograma(request):
         'Ahogamientos': todas_horas.values
     })
 
-    # 5. Visualización Bokeh
-    # Crea las etiquetas de las barras: '0-1', '1-2', ..., '23-0'
     intervalos = [f"{h}-{(h+1)%24}" for h in range(24)]
     df_final['hora_label'] = intervalos
 
-    # Al crear el gráfico Bokeh:
     source = ColumnDataSource(df_final)
     p = figure(
         x_range=intervalos,
@@ -700,45 +672,46 @@ def generar_histograma(request):
     resources = CDN.render()
     return JsonResponse({'grafica_html': f"{resources}\n{script}\n{div}"})
 
-# Mapeo filtro-ORM (ajusta según tus ForeignKeys)
-MAPEO_FILTROS = {
-    "actividad": "incidente__actividad__nombreactividad",
-    "deteccion": "incidente__deteccion__nombredeteccion",
-    "riesgo": "incidente__riesgo__nombreriesgo",
-    "localizacion": "incidente__localizacion__nombrelocalizacion",
-    "intervencion": "incidente__intervencion__nombreintervencion",
-    "zonavigilada": "incidente__zona__nombrezonavigilada",
-    "causa": "causavictima__causa__nombrecausa",
-    "factorriesgo": "factorriesgovictima__factorriesgo__nombrefactorriesgo",
-    "antecedente": "antecedentevictima__antecedente__nombreantecedente",
-    "primerinterviniente": "primerinterviniente__nombreprimerinterviniente",
-    "materialrescate": "materialrescate__nombrematerialrescate",
-    "extraccion": "extraccion__nombreextraccion",
-    "tipoahogamiento": "tipoahogamiento__nombretipoahogamiento",
-    "reanimacion": "reanimacion__nombrereanimacion",
-    "pronostico": "pronostico__nombrepronostico"
-}
-
-TITULO_FILTROS = {
-    "actividad": "actividad",
-    "deteccion": "detección",
-    "riesgo": "riesgo detectado",
-    "localizacion": "localización",
-    "intervencion": "intervención",
-    "zonavigilada": "zona vigilada",
-    "causa": "causa del ahogamiento",
-    "factorriesgo": "factor de riesgo",
-    "antecedente": "antecedente",
-    "primerinterviniente": "primer interviniente",
-    "materialrescate": "material de rescate",
-    "extraccion": "extracción",
-    "tipoahogamiento": "ahogamiento",
-    "reanimacion": "reanimación",
-    "pronostico": "pronóstico"
-}
-
+@csrf_exempt
 def generar_radar(request):
     filtro = request.POST.get('filtro')
+
+    MAPEO_FILTROS = {
+        "actividad": "incidente__actividad__nombreactividad",
+        "deteccion": "incidente__deteccion__nombredeteccion",
+        "riesgo": "incidente__riesgo__nombreriesgo",
+        "localizacion": "incidente__localizacion__nombrelocalizacion",
+        "intervencion": "incidente__intervencion__nombreintervencion",
+        "zonavigilada": "incidente__zona__nombrezonavigilada",
+        "causa": "causavictima__causa__nombrecausa",
+        "factorriesgo": "factorriesgovictima__factorriesgo__nombrefactorriesgo",
+        "antecedente": "antecedentevictima__antecedente__nombreantecedente",
+        "primerinterviniente": "primerinterviniente__nombreprimerinterviniente",
+        "materialrescate": "materialrescate__nombrematerialrescate",
+        "extraccion": "extraccion__nombreextraccion",
+        "tipoahogamiento": "tipoahogamiento__nombretipoahogamiento",
+        "reanimacion": "reanimacion__nombrereanimacion",
+        "pronostico": "pronostico__nombrepronostico"
+    }
+
+    TITULO_FILTROS = {
+        "actividad": "actividad",
+        "deteccion": "detección",
+        "riesgo": "riesgo detectado",
+        "localizacion": "localización",
+        "intervencion": "intervención",
+        "zonavigilada": "zona vigilada",
+        "causa": "causa del ahogamiento",
+        "factorriesgo": "factor de riesgo",
+        "antecedente": "antecedente",
+        "primerinterviniente": "primer interviniente",
+        "materialrescate": "material de rescate",
+        "extraccion": "extracción",
+        "tipoahogamiento": "ahogamiento",
+        "reanimacion": "reanimación",
+        "pronostico": "pronóstico"
+    }
+
     if not filtro or filtro not in MAPEO_FILTROS:
         return JsonResponse({'error': 'Debes seleccionar un filtro válido.'})
 
@@ -756,7 +729,6 @@ def generar_radar(request):
     categoria = campo_bd.split('__')[-1]
     df[campo_bd] = df[campo_bd].fillna('Desconocido').astype(str)
 
-    # Filtro estricto antes de head(7)
     df = df[~df[campo_bd].str.strip().str.lower().isin(['sin datos', 'desconocido', 'n/a', 'nan', 'no consta', '-', 'none'])]
     df = df.sort_values('num', ascending=False).head(7)
 
@@ -775,7 +747,6 @@ def generar_radar(request):
     max_radio = max(valores) * 1.08
     x_poly = max_radio * np.cos(angles_poly)
     y_poly = max_radio * np.sin(angles_poly)
-    # Radar real: CIERRA polígono repitiendo el primer punto al final
     x = np.array(valores) * np.cos(angles)
     y = np.array(valores) * np.sin(angles)
     x_data = np.concatenate([x, [x[0]]])
@@ -815,14 +786,11 @@ def generar_radar(request):
     p.grid.grid_line_color = None
     p.outline_line_color = None
 
-    # Fondo heptágono gris
     p.patch(x_poly, y_poly, color="#ececec", alpha=0.7, line_width=2)
 
-    # Líneas guía radios
     for i in range(N):
         p.line([0, x_poly[i]], [0, y_poly[i]], color="#bbb", line_dash="dotted", line_width=1.2)
-    # POLÍGONO DEL RADAR CON BORDE COMPLETAMENTE CERRADO
-    # Polígono y área rellena con el source_poly
+
     p.line('x_data', 'y_data', source=source_poly, color="#1976d2", line_width=3)
     p.patch('x_data', 'y_data', source=source_poly, color="#1976d2", alpha=0.16)
 
@@ -844,7 +812,7 @@ def generar_radar(request):
     resources = CDN.render()
     return JsonResponse({'grafica_html': f"{resources}\n{script}\n{div}"})
 
-@csrf_exempt  # Si usas protección CSRF estricta, quítalo o adáptalo
+@csrf_exempt
 def comparativa_sklearn(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Método no permitido.'})
@@ -872,7 +840,6 @@ def comparativa_sklearn(request):
         )
         df = pd.DataFrame(list(qs))
 
-        # Limpieza...
         col_map = {
             'actividad': 'incidente__actividad__nombreactividad',
             'localizacion': 'incidente__localizacion__nombrelocalizacion',
@@ -920,7 +887,6 @@ def comparativa_sklearn(request):
         }
         nuevo_caso = pd.DataFrame([nuevo_dict])
 
-        # Codificación
         df_X = df[cat_cols + num_cols]
         X_concat = pd.concat([df_X, nuevo_caso], ignore_index=True)
         encoder = OneHotEncoder(handle_unknown='ignore', sparse_output=False)
@@ -929,7 +895,6 @@ def comparativa_sklearn(request):
         edad_scaled = scaler.fit_transform(X_concat[['edad']])
         X_total = np.hstack([cat_encoded, edad_scaled])
 
-        # RandomForest
         X_model = X_total[:-1, :]
         X_caso = X_total[-1, :].reshape(1, -1)
         model = RandomForestClassifier(n_estimators=80, random_state=7)
@@ -942,12 +907,10 @@ def comparativa_sklearn(request):
             f"<br><span style='font-size:12px;'>(por modelo predictivo usando todas las variables seleccionadas)</span>"
         )
 
-        # PCA y preparación de fuentes para Bokeh
         pca = PCA(n_components=2)
         X_2d = pca.fit_transform(X_total)
         idx_nuevo = len(X_2d) - 1
 
-        # Históricos interactivos para hover
         df_hist = pd.DataFrame({
             'x': X_2d[:-1, 0],
             'y': X_2d[:-1, 1],
@@ -957,7 +920,6 @@ def comparativa_sklearn(request):
             'color': df['mortal'].map({0: '#1976d2', 1: '#d32f2f'})
         })
         source_hist = ColumnDataSource(df_hist)
-        # Solo la estrella (sin campos tooltip)
         df_user = pd.DataFrame([{
             'x': X_2d[-1, 0],
             'y': X_2d[-1, 1],
@@ -968,7 +930,7 @@ def comparativa_sklearn(request):
         p = figure(
             title="Comparativa del caso introducido con datos históricos",
             width=650, height=500,
-            tools="pan,wheel_zoom,box_zoom,reset,save",  # NO hay hover herramientas aplicadas a todos por defecto
+            tools="pan,wheel_zoom,box_zoom,reset,save",
             active_scroll="wheel_zoom",
             background_fill_color="#fafafa"
         )
@@ -977,12 +939,11 @@ def comparativa_sklearn(request):
         p.yaxis.visible = False
         p.grid.grid_line_color = None
 
-        # Puntos históricos (círculos con tooltip)
         scatter_hist = p.scatter(
             'x', 'y', color='color', size=8, alpha=0.63,
             source=source_hist
         )
-        # Estrella usuario (sin campos adicionales, por tanto sin hover posible)
+
         p.scatter(
             'x', 'y', color='color', size=18, marker='star',
             source=source_user
@@ -1044,21 +1005,19 @@ def generar_mapa_hotspots(request):
     if df.empty:
         return JsonResponse({'error': 'No hay datos para ese rango'})
 
-    # Conversión y limpieza
     df['incidente__latitud'] = pd.to_numeric(df['incidente__latitud'], errors='coerce')
     df['incidente__longitud'] = pd.to_numeric(df['incidente__longitud'], errors='coerce')
     df = df.dropna(subset=['incidente__latitud', 'incidente__longitud'])
     df['incidente__fecha'] = pd.to_datetime(df['incidente__fecha'])
     df['month'] = df['incidente__fecha'].dt.strftime('%B')
-    df['victims'] = 1  # Cámbialo si tienes el campo real
+    df['victims'] = 1  
     df['mortal'] = df['pronostico__nombrepronostico'].str.strip().str.lower().eq('ahogamiento mortal').astype(int)
 
-    # --- Clustering espacial con DBSCAN ---
     coords = df[['incidente__latitud', 'incidente__longitud']].to_numpy()
     scaler = StandardScaler()
     coords_scaled = scaler.fit_transform(coords)
 
-    dbscan = DBSCAN(eps=0.01, min_samples=3)  # Ajusta eps/min_samples según tus necesidades
+    dbscan = DBSCAN(eps=0.01, min_samples=3) 
     labels = dbscan.fit_predict(coords_scaled)
     df['cluster'] = labels
 
@@ -1067,19 +1026,17 @@ def generar_mapa_hotspots(request):
     if df.empty:
         return JsonResponse({'error': 'No se detectaron hotspots (clusters) con los parámetros elegidos.'})
 
-    # Resumen sólo para pasar los datos al frontend (ya no se construye tabla HTML aquí)
     summary = df.groupby('cluster').agg(
         total_incidents=('codvictima', 'count'),
         total_victims=('victims', 'sum'),
         total_mortal=('mortal', 'sum'),
         most_common_month=('month', lambda x: x.mode().iloc[0] if not x.mode().empty else ''),
-        main_place=('incidente__localidad__nombrelocalidad', lambda x: x.mode().iloc[0] if not x.mode().empty else 'Desconocido')  # NUEVO
+        main_place=('incidente__localidad__nombrelocalidad', lambda x: x.mode().iloc[0] if not x.mode().empty else 'Desconocido') 
     ).reset_index()
 
     summary['mortality_rate'] = (summary['total_mortal'] / summary['total_incidents'] * 100).round(1)
     summary = summary.sort_values(by='total_incidents', ascending=False).reset_index(drop=True)
 
-    # Centroides para pintar los clusters en el mapa
     centers = []
     for cluster in summary['cluster']:
         points = df[df['cluster'] == cluster][['incidente__latitud','incidente__longitud']]
@@ -1088,7 +1045,6 @@ def generar_mapa_hotspots(request):
     summary['center_lat'] = [c[0] for c in centers]
     summary['center_lon'] = [c[1] for c in centers]
 
-    # Solo el div del mapa en el HTML
     map_div = '<div id="mapa-hotspots" style="height: 400px; margin-top: 10px;"></div>'
     html_response = f'<div><h3>Hotspots Detectados con Clustering Espacial</h3>{map_div}</div>'
 

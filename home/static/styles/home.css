@@ -1,79 +1,71 @@
-  body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #DEEFE7;
-      color: #002333;
-  }
-
-  header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-    box-shadow: 0 2px 8px rgba(0,35,51,0.07);
-    background: linear-gradient(90deg, #159A9C 0%, #B4BEC9 100%);
-    padding: 32px 0 16px 0;
-    color: #FFFFFF;
-    text-align: left;
-    padding: 16px 24px 8px 24px;
-  }
-  
-  nav {
-    position: relative; /* NO uses fixed ni sticky aquí */
-    top: 0;
-    z-index: 999;
-  }
-  
-  header h1 {
-    color: #FFFFFF;
-    font-size: 2.8rem;
-    margin: 0 0 6px 32px;
-    font-weight: 800;
-    letter-spacing: -2px;
-    text-shadow: 1px 2px 8px #00233322;
-  }
-  header .subtitulo {
-    color: #DEEFE7;
-    font-size: 1.15rem;
-    margin-left: 32px;
-    margin-bottom: 2px;
-  }
-  header .descripcion {
-    color: #DEEFE7;
-    font-size: 1rem;
-    margin-left: 32px;
-  }
-  
-  
-  /* Ajusta el margen superior del contenido principal */
-  body {
-    margin-top: 153.5px; /* Ajusta este valor según la altura real de tu header y nav */
-  }
-  
-  h1 {
-    margin: 10px 0 0 0;
-    color: #002333;
-    font-size: 2.5rem;
-  }
-  
-  .subtitulo {
-    color: #159A9C;
-    font-size: 1.2rem;
-    margin: 5px 0;
-  }
-  
-  .descripcion {
-    color: #002333;
-    font-size: 1rem;
-    margin: 5px 0 15px 0;
-  }
-
-  body {
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  color: #002333;
+  padding-top: 56px;
   background: #def6f2;
 }
 
-/* Layout de dos columnas */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0,35,51,0.07);
+  background: linear-gradient(90deg, #159A9C 0%, #B4BEC9 100%);
+  color: #FFFFFF;
+  text-align: left;
+  padding: 16px 24px 8px 24px;
+}
+
+nav {
+  position: relative; 
+  top: 0;
+  z-index: 999;
+}
+  
+header h1 {
+  color: #FFFFFF;
+  font-size: 2.8rem;
+  margin: 0 0 6px 32px;
+  font-weight: 800;
+  letter-spacing: -2px;
+  text-shadow: 1px 2px 8px #00233322;
+}
+
+header .subtitulo {
+  color: #DEEFE7;
+  font-size: 1.15rem;
+  margin-left: 32px;
+  margin-bottom: 2px;
+}
+
+header .descripcion {
+  color: #DEEFE7;
+  font-size: 1rem;
+  margin-left: 32px;
+}
+  
+h1 {
+  margin: 10px 0 0 0;
+  color: #002333;
+  font-size: 2.5rem;
+}
+  
+.subtitulo {
+  color: #159A9C;
+  font-size: 1.2rem;
+  margin: 5px 0;
+}
+  
+.descripcion {
+  color: #002333;
+  font-size: 1rem;
+  margin: 5px 0 15px 0;
+}
+
+
 .layout-flex {
   display: flex;
   justify-content: center;
@@ -85,16 +77,16 @@
   padding: 40px 0; 
 }
 
-/* Columna izquierda: selector */
+
 .selector-graficas {
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 2px 12px rgba(21,154,156,0.07);
   padding: 32px 24px;
-  width: 200px;            /* Más estrecha */
+  width: 200px;           
   min-width: 160px;
-  margin-left: 0;          /* Pegada al borde */
-  margin-right: 0;         /* Sin separación extra a la derecha */
+  margin-left: 0;          
+  margin-right: 0;         
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -138,7 +130,7 @@
   color: #fff;
 }
 
-/* Columna derecha: recuadro para la gráfica */
+
 .contenedor-grafica {
   flex: 1 1 0;
   min-width: 900px;
@@ -147,20 +139,19 @@
   border-radius: 16px;
   box-shadow: 0 2px 12px rgba(21,154,156,0.07);
   padding: 32px 32px;
-  margin-left: 0;          /* Sin separación extra */
+  margin-left: 0;          
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 
-/* Responsive: apila en móvil */
 @media (max-width: 900px) {
   .layout-flex {
     display: flex;
     align-items: flex-start;
-    gap: 32px;               /* Menos espacio entre columnas */
-    max-width: 96vw;         /* Más ancho total */
+    gap: 32px;               
+    max-width: 96vw;        
     margin: 40px auto 0 auto;
     padding: 0;
   }
@@ -296,31 +287,31 @@ input[type="text"] {
 .multi-select {
   position: relative;
   width: 100%;
-  min-width: 120px;    /* antes 220px, ahora más pequeño */
+  min-width: 120px;    
   margin-bottom: 8px;
 }
 
 .multi-select-lugar {
   position: relative;
   width: 100%;
-  min-width: 120px;    /* antes 220px, ahora más pequeño */
+  min-width: 120px;    
   margin-bottom: 8px;
 }
 
 .multi-select-dia {
   position: relative;
   width: 100%;
-  min-width: 120px;    /* antes 220px, ahora más pequeño */
+  min-width: 120px;    
   margin-bottom: 10px;
 }
 
 .multi-select-header {
-  background: #f6f8fa;         /* igual que tus inputs */
-  border: 1px solid #B4BEC9;   /* igual que tus inputs */
+  background: #f6f8fa;         
+  border: 1px solid #B4BEC9;   
   border-radius: 8px;
-  color: #888;                 /* gris, como pediste antes */
-  font-size: 1rem;             /* igual que los inputs */
-  font-family: inherit;        /* igual que el resto del formulario */
+  color: #888;                 
+  font-size: 1rem;             
+  font-family: inherit;        
   font-weight: 400;
   padding: 10px 12px;
   width: 100%;
@@ -401,10 +392,10 @@ input[type="text"] {
 }
 
 .multi-select-header.disabled {
-  background: #DEEFE7;         /* un gris azulado, igual que el resto */
-  color: #B4BEC9;              /* gris claro */
+  background: #DEEFE7;         
+  color: #B4BEC9;              
   cursor: not-allowed;
-  opacity: 1;                  /* para que no se vea difuminado */
+  opacity: 1;                  
 }
 
 .multi-select-pills,
@@ -466,7 +457,7 @@ input[type="text"] {
 }
 
 .switch-label input:checked + .switch-slider {
-  background: #1a73e8; /* Azul activo */
+  background: #1a73e8; 
 }
 
 .switch-label input:checked + .switch-slider::before {
