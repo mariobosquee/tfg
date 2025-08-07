@@ -126,6 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setProvinciasBloqueadas(false);
         }
     }
+
     // Actualizar pills de provincias
     function updateProvPills() {
         provPills.innerHTML = '';
@@ -790,7 +791,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateFiltroPills();
     });
 
-    // Generar radar
+    // Botón para generar el radar
     const generateRadar = document.getElementById('btn-generar-radar');
     generateRadar.addEventListener('click', function() {
         let filtroSeleccionado = Array.from(filtroCheckboxes).find(cb => cb.checked);
@@ -903,19 +904,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const localizacionPills = document.getElementById('localizacion-pills');
     const localizacionCheckboxes = localizacionOptions.querySelectorAll('input[type="checkbox"]');
 
+    // Abrir/cerrar menú de filtros
     localizacionHeader.addEventListener('click', function(e) {
         if (localizacionHeader.classList.contains('disabled')) return;
         localizacionOptions.classList.toggle('open');
     });
 
-
+    // Cerrado al hacer click fuera
     document.addEventListener('click', function(e) {
         if (!localizacionHeader.contains(e.target) && !localizacionOptions.contains(e.target)) {
             localizacionOptions.classList.remove('open');
         }
     });
 
-
+    // Función para actualizar la pill
     function updateLocalizacionPills() {
         localizacionPills.innerHTML = '';
         const selected = [];
@@ -939,30 +941,36 @@ document.addEventListener('DOMContentLoaded', function() {
         localizacionHeader.textContent = selected.length > 0 ? `${selected.length} seleccionada` : 'Selecciona localización';
     }
 
-
+    // Al cambiar cualquier filtro, actualizar pill única
     localizacionCheckboxes.forEach(cb => cb.addEventListener('change', updateLocalizacionPills));
 
-
+    // Inicializa la pill/filtro al cargar
     updateLocalizacionPills();
-    
+
+    // Inicializa un selector de elección simple con multiselección para el campo 'localizacion'
     setSingleChoiceMultiSelect('localizacion', updateLocalizacionPills);
 
 
-    // ==== Multi-select de Zona Vigilada ====
+    // Multi-select de Zona Vigilada
     const zonaHeader = document.getElementById('zonavigilada-header');
     const zonaOptions = document.getElementById('zonavigilada-options');
     const zonaPills = document.getElementById('zonavigilada-pills');
     const zonaCheckboxes = zonaOptions.querySelectorAll('input[type="checkbox"]');
 
+    // Abrir/cerrar menú de filtros
     zonaHeader.addEventListener('click', function(e) {
         if (zonaHeader.classList.contains('disabled')) return;
         zonaOptions.classList.toggle('open');
     });
+
+    // Cerrado al hacer click fuera
     document.addEventListener('click', function(e) {
         if (!zonaHeader.contains(e.target) && !zonaOptions.contains(e.target)) {
             zonaOptions.classList.remove('open');
         }
     });
+
+    // Función para actualizar la pill
     function updateZonaPills() {
         zonaPills.innerHTML = '';
         const selected = [];
@@ -985,26 +993,37 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         zonaHeader.textContent = selected.length > 0 ? `${selected.length} seleccionada` : 'Selecciona opción';
     }
+
+    // Al cambiar cualquier filtro, actualizar pill única
     zonaCheckboxes.forEach(cb => cb.addEventListener('change', updateZonaPills));
+
+    // Inicializa la pill/filtro al cargar
     updateZonaPills();
+
+    // Inicializa un selector de elección simple con multiselección para el campo 'zonavigilada'
     setSingleChoiceMultiSelect('zonavigilada', updateZonaPills);
 
 
-    // ==== Multi-select de Riesgo ====
+    // Multi-select de Riesgo
     const riesgoHeader = document.getElementById('riesgo-header');
     const riesgoOptions = document.getElementById('riesgo-options');
     const riesgoPills = document.getElementById('riesgo-pills');
     const riesgoCheckboxes = riesgoOptions.querySelectorAll('input[type="checkbox"]');
 
+    // Abrir/cerrar menú de filtros
     riesgoHeader.addEventListener('click', function(e) {
         if (riesgoHeader.classList.contains('disabled')) return;
         riesgoOptions.classList.toggle('open');
     });
+
+    // Cerrado al hacer click fuera
     document.addEventListener('click', function(e) {
         if (!riesgoHeader.contains(e.target) && !riesgoOptions.contains(e.target)) {
             riesgoOptions.classList.remove('open');
         }
     });
+
+    // Función para actualizar la pill
     function updateRiesgoPills() {
         riesgoPills.innerHTML = '';
         const selected = [];
@@ -1027,26 +1046,36 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         riesgoHeader.textContent = selected.length > 0 ? `${selected.length} seleccionada` : 'Selecciona riesgo';
     }
+
+    // Al cambiar cualquier filtro, actualizar pill única
     riesgoCheckboxes.forEach(cb => cb.addEventListener('change', updateRiesgoPills));
+
+    // Inicializa la pill/filtro al cargar
     updateRiesgoPills();
+
+    // Inicializa un selector de elección simple con multiselección para el campo 'riesgo'
     setSingleChoiceMultiSelect('riesgo', updateRiesgoPills);
 
-
-    // ==== Multi-select de Intervención ====
+    // Multi-select de Intervención
     const intervencionHeader = document.getElementById('intervencion-header');
     const intervencionOptions = document.getElementById('intervencion-options');
     const intervencionPills = document.getElementById('intervencion-pills');
     const intervencionCheckboxes = intervencionOptions.querySelectorAll('input[type="checkbox"]');
 
+    // Abrir/cerrar menú de filtros
     intervencionHeader.addEventListener('click', function(e) {
         if (intervencionHeader.classList.contains('disabled')) return;
         intervencionOptions.classList.toggle('open');
     });
+
+    // Cerrado al hacer click fuera
     document.addEventListener('click', function(e) {
         if (!intervencionHeader.contains(e.target) && !intervencionOptions.contains(e.target)) {
             intervencionOptions.classList.remove('open');
         }
     });
+
+    // Función para actualizar la pill
     function updateIntervencionPills() {
         intervencionPills.innerHTML = '';
         const selected = [];
@@ -1069,12 +1098,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         intervencionHeader.textContent = selected.length > 0 ? `${selected.length} seleccionada` : 'Selecciona intervención';
     }
+
+    // Al cambiar cualquier filtro, actualizar pill única
     intervencionCheckboxes.forEach(cb => cb.addEventListener('change', updateIntervencionPills));
+
+    // Inicializa la pill/filtro al cargar
     updateIntervencionPills();
+
+    // Inicializa un selector de elección simple con multiselección para el campo 'intervencion'
     setSingleChoiceMultiSelect('intervencion', updateIntervencionPills);
 
 
-    // ==== Botón limpiar filtros sklearn ====
+    // Botón limpiar filtros sklearn
     const clearSklearn = document.getElementById('btn-limpiar-sklearn');
     clearSklearn.addEventListener('click', function() {
         document.querySelectorAll('#actividad-options input[type="checkbox"]').forEach(cb => cb.checked = false);
@@ -1090,7 +1125,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateIntervencionPills();
     });
 
-     // ==== Botón para comparar caso (enviar al backend sklearn y mostrar gráfica comparativa) ====
+    // Botón para comparar caso (enviar al backend sklearn y mostrar gráfica comparativa)
     const btnGenerarSklearn = document.getElementById('btn-generar-sklearn');
     btnGenerarSklearn.addEventListener('click', function() {
         const actividadChecked = document.querySelector('#actividad-options input[type="checkbox"]:checked');
@@ -1142,13 +1177,14 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('anio-fin-hotspots').value = '';
     });
 
+    // Pinta el mapa para los hotspots
     function pintarMapaHotspots(clusters) {
         if (!window.L) { console.error('Leaflet no está cargado'); return; }
         var mapDiv = document.getElementById('mapa-hotspots');
         if (!mapDiv) { console.error('El div mapa-hotspots NO existe'); return; }
 
         var mapDiv = document.getElementById('mapa-hotspots');
-        mapDiv.innerHTML = ""; // Limpia si hace falta
+        mapDiv.innerHTML = "";
 
         var map = L.map('mapa-hotspots').setView([43.46, -3.81], 9);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -1176,7 +1212,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-
+    // Botón para generar los hotspots
     const btnMapaHotspots = document.getElementById('btn-generar-hotspots');
     btnMapaHotspots.addEventListener('click', function() {
         const anioInicio = document.getElementById('anio-inicio-hotspots').value;
@@ -1196,13 +1232,11 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             const container = document.getElementById('grafica-container');
             container.innerHTML = '';
-            if (data.html) {  // asegúrate que la clave aquí es 'html', no 'grafica_html'
+            if (data.html) {  
                 container.innerHTML = data.html;
-                // Cuando el DOM ya tiene el div del mapa:
                 if (data.clusters && data.clusters.length > 0) {
                     pintarMapaHotspots(data.clusters);
                 } else {
-                    // Opcional: muestra aviso si no hay clusters para pintar
                     console.log('No hay clusters para el mapa');
                 }
             } else if (data.error) {

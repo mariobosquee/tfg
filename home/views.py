@@ -393,7 +393,6 @@ def generar_diagrama_dispersion(request):
         palette = [colores_dict[s] for s in sexos_presentes]
         color_mapper = factor_cmap('Sexo', palette=palette, factors=sexos_presentes)
         legend = 'Sexo'
-        # Solo Edad y Ahogamientos en tooltip
         hover = HoverTool(tooltips=[
             ('Edad', '@Edad{0}'),
             ('Ahogamientos', '@Ahogamientos{0}')
@@ -419,7 +418,6 @@ def generar_diagrama_dispersion(request):
         toolbar_location='right'
     )
 
-    # Solo puntos si la línea NO está activada
     if not mostrar_linea:
         source = ColumnDataSource(df_group)
         scatter_args = dict(
@@ -434,7 +432,6 @@ def generar_diagrama_dispersion(request):
             scatter_args['legend_field'] = legend
         p.scatter(**scatter_args)
 
-    # Solo línea si la línea SÍ está activada
     if mostrar_linea:
         if color_sexo:
             for sexo_valor, color in zip(sexos_presentes, palette):
@@ -495,6 +492,7 @@ def generar_mapa(request):
 
     if not lugares:
         return JsonResponse({'error': 'Debes seleccionar al menos un lugar'})
+
 
     gdf = gpd.read_file('C:/Users/Usuario/Desktop/UC/Cuarto_Curso/Segundo Cuatrimestre/TFG/projectAhogamientos/home/data/shapefiles_provincias_espana_actualizado.shp')
 
@@ -674,7 +672,7 @@ def generar_histograma(request):
     resources = CDN.render()
     return JsonResponse({'grafica_html': f"{resources}\n{script}\n{div}"})
 
-@csrf_exempt 
+@csrf_exempt
 def generar_radar(request):
     filtro = request.POST.get('filtro')
 
@@ -792,9 +790,11 @@ def generar_radar(request):
 
     for i in range(N):
         p.line([0, x_poly[i]], [0, y_poly[i]], color="#bbb", line_dash="dotted", line_width=1.2)
+
     p.line('x_data', 'y_data', source=source_poly, color="#1976d2", line_width=3)
     p.patch('x_data', 'y_data', source=source_poly, color="#1976d2", alpha=0.16)
 
+    # Puntos y etiquetas con source_labels
     p.scatter('x', 'y', source=source_labels, marker="circle", size=16, color="#d32f2f")
 
     p.add_layout(LabelSet(
@@ -812,7 +812,7 @@ def generar_radar(request):
     resources = CDN.render()
     return JsonResponse({'grafica_html': f"{resources}\n{script}\n{div}"})
 
-@csrf_exempt  
+@csrf_exempt
 def comparativa_sklearn(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Método no permitido.'})
@@ -930,7 +930,7 @@ def comparativa_sklearn(request):
         p = figure(
             title="Comparativa del caso introducido con datos históricos",
             width=650, height=500,
-            tools="pan,wheel_zoom,box_zoom,reset,save",  
+            tools="pan,wheel_zoom,box_zoom,reset,save",
             active_scroll="wheel_zoom",
             background_fill_color="#fafafa"
         )
@@ -943,6 +943,7 @@ def comparativa_sklearn(request):
             'x', 'y', color='color', size=8, alpha=0.63,
             source=source_hist
         )
+
         p.scatter(
             'x', 'y', color='color', size=18, marker='star',
             source=source_user
@@ -1016,7 +1017,7 @@ def generar_mapa_hotspots(request):
     scaler = StandardScaler()
     coords_scaled = scaler.fit_transform(coords)
 
-    dbscan = DBSCAN(eps=0.01, min_samples=3)
+    dbscan = DBSCAN(eps=0.01, min_samples=3) 
     labels = dbscan.fit_predict(coords_scaled)
     df['cluster'] = labels
 
@@ -1030,7 +1031,7 @@ def generar_mapa_hotspots(request):
         total_victims=('victims', 'sum'),
         total_mortal=('mortal', 'sum'),
         most_common_month=('month', lambda x: x.mode().iloc[0] if not x.mode().empty else ''),
-        main_place=('incidente__localidad__nombrelocalidad', lambda x: x.mode().iloc[0] if not x.mode().empty else 'Desconocido')  # NUEVO
+        main_place=('incidente__localidad__nombrelocalidad', lambda x: x.mode().iloc[0] if not x.mode().empty else 'Desconocido') 
     ).reset_index()
 
     summary['mortality_rate'] = (summary['total_mortal'] / summary['total_incidents'] * 100).round(1)
