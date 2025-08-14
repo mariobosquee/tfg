@@ -374,7 +374,7 @@ input[type="text"] {
 }
 
 .multi-select.open .multi-select-options {
-  display: block;
+  display: block !important;
 }
 
 .multi-select-option {
@@ -449,15 +449,14 @@ input[type="text"] {
     width: 100%;
 }
 
-.multi-select.open .multi-select-options {
+.multi-select.open .multi-select-options.open {
     display: block;
 }
 
-.multi-select-option {
+.multi-select-option.open {
     padding: 10px 12px;
     cursor: pointer;
     color: #002333;
-    display: flex;
     align-items: center;
 }
 

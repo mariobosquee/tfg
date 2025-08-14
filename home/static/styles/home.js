@@ -20,6 +20,8 @@ document.addEventListener('DOMContentLoaded', function() {
         'btn-radar',
         'btn-analisis-automático',
         'btn-hotspots',
+        'btn-kmeans',
+        'btn-tree',
     ];
 
     // IDs de los filtros asociados, en el mismo orden que los botones
@@ -33,6 +35,8 @@ document.addEventListener('DOMContentLoaded', function() {
         'filtros-radar',
         'filtros-analisis-auto',
         'filtros-hotspots',
+        'filtros-kmeans',
+        'filtros-tree',
     ];
 
     // Asocia cada botón a su filtro, alternando visibilidad y clases
@@ -53,12 +57,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const comOptions = document.getElementById('com-options');
     const comPills = document.getElementById('com-pills');
     const comCheckboxes = comOptions.querySelectorAll('input[type="checkbox"]');
+    const comMultiSelect = comOptions.parentElement;
 
     // Multi-select de Provincias
     const provHeader = document.getElementById('prov-header');
     const provOptions = document.getElementById('prov-options');
     const provPills = document.getElementById('prov-pills');
     const provCheckboxes = provOptions.querySelectorAll('input[type="checkbox"]');
+    const provMultiSelect = provOptions.parentElement;
 
     // Control de bloqueo/desbloqueo
     function setProvinciasBloqueadas(bloquear) {
@@ -75,23 +81,23 @@ document.addEventListener('DOMContentLoaded', function() {
     // Abrir/cerrar menú comunidades
     comHeader.addEventListener('click', function(e) {
         if (comHeader.classList.contains('disabled')) return;
-        comOptions.classList.toggle('open');
+            comMultiSelect.classList.toggle('open');
     });
 
     // Cerrado al hacer click fuera
     document.addEventListener('click', function(e) {
         if (!comHeader.contains(e.target) && !comOptions.contains(e.target)) {
-        comOptions.classList.remove('open');
+            comMultiSelect.classList.remove('open');
         }
         if (!provHeader.contains(e.target) && !provOptions.contains(e.target)) {
-        provOptions.classList.remove('open');
+            provMultiSelect.classList.remove('open');
         }
     });
 
     // Abrir/cerrar menú provincias
     provHeader.addEventListener('click', function(e) {
         if (provHeader.classList.contains('disabled')) return;
-        provOptions.classList.toggle('open');
+            provMultiSelect.classList.toggle('open');
     });
 
     // Actualizar pills de comunidades
@@ -236,17 +242,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const nacOptions = document.getElementById('nacionalidad-options');
     const nacPills = document.getElementById('nacionalidad-pills');
     const nacCheckboxes = nacOptions.querySelectorAll('input[type="checkbox"]');
+    const nacMultiSelect = nacOptions.parentElement;
 
     // Abrir/cerrar menú nacionalidades
     nacHeader.addEventListener('click', function(e) {
         if (nacHeader.classList.contains('disabled')) return;
-        nacOptions.classList.toggle('open');
+            nacMultiSelect.classList.toggle('open');
     });
     
     // Cerrado al hacer click fuera
     document.addEventListener('click', function(e) {
         if (!nacHeader.contains(e.target) && !nacOptions.contains(e.target)) {
-        nacOptions.classList.remove('open');
+            nacMultiSelect.classList.remove('open');
         }
     });
 
@@ -456,17 +463,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const lugOptions = document.getElementById('lugar-options');
     const lugPills = document.getElementById('lugar-pills');
     const lugCheckboxes = lugOptions.querySelectorAll('input[type="checkbox"]');
+    const lugMultiSelect = lugOptions.parentElement;
 
     // Abrir/cerrar menú lugares
     lugHeader.addEventListener('click', function(e) {
         if (lugHeader.classList.contains('disabled')) return;
-        lugOptions.classList.toggle('open');
+            lugMultiSelect.classList.toggle('open');
     });
 
     // Cerrado al hacer click fuera
     document.addEventListener('click', function(e) {
         if (!lugHeader.contains(e.target) && !lugOptions.contains(e.target)) {
-        lugOptions.classList.remove('open');
+            lugMultiSelect.classList.remove('open');
         }
     });
 
@@ -589,17 +597,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const diaOptions = document.getElementById('dia-options');
     const diaPills = document.getElementById('dia-pills');
     const diaCheckboxes = diaOptions.querySelectorAll('input[type="checkbox"]');
+    const diaMultiSelect = diaOptions.parentElement;
 
     // Abrir/cerrar menú días
     diaHeader.addEventListener('click', function(e) {
         if (diaHeader.classList.contains('disabled')) return;
-        diaOptions.classList.toggle('open');
+            diaMultiSelect.classList.toggle('open');
     });
 
     // Cerrado al hacer click fuera
     document.addEventListener('click', function(e) {
         if (!diaHeader.contains(e.target) && !diaOptions.contains(e.target)) {
-            diaOptions.classList.remove('open');
+            diaMultiSelect.classList.remove('open');
         }
     });
 
@@ -722,17 +731,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const filtroOptions = document.getElementById('filtro-options');
     const filtroPills = document.getElementById('filtro-pills');
     const filtroCheckboxes = filtroOptions.querySelectorAll('input[type="checkbox"]');
+    const filtroMultiSelect = filtroOptions.parentElement;
 
     // Abrir/cerrar menú de filtros
     filtroHeader.addEventListener('click', function(e) {
         if (filtroHeader.classList.contains('disabled')) return;
-        filtroOptions.classList.toggle('open');
+            filtroMultiSelect.classList.toggle('open');
     });
 
     // Cerrado al hacer click fuera
     document.addEventListener('click', function(e) {
         if (!filtroHeader.contains(e.target) && !filtroOptions.contains(e.target)) {
-            filtroOptions.classList.remove('open');
+            filtroMultiSelect.classList.remove('open');
         }
     });
 
@@ -850,17 +860,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const actividadOptions = document.getElementById('actividad-options');
     const actividadPills = document.getElementById('actividad-pills');
     const actividadCheckboxes = actividadOptions.querySelectorAll('input[type="checkbox"]');
+    const actividadMultiSelect = actividadOptions.parentElement;
 
     // Abrir/cerrar menú de filtros
     actividadHeader.addEventListener('click', function(e) {
         if (actividadHeader.classList.contains('disabled')) return;
-        actividadOptions.classList.toggle('open');
+            actividadMultiSelect.classList.toggle('open');
     });
 
     // Cerrado al hacer click fuera
     document.addEventListener('click', function(e) {
         if (!actividadHeader.contains(e.target) && !actividadOptions.contains(e.target)) {
-            actividadOptions.classList.remove('open');
+            actividadMultiSelect.classList.remove('open');
         }
     });
 
@@ -903,17 +914,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const localizacionOptions = document.getElementById('localizacion-options');
     const localizacionPills = document.getElementById('localizacion-pills');
     const localizacionCheckboxes = localizacionOptions.querySelectorAll('input[type="checkbox"]');
+    const localizacionMultiSelect = localizacionOptions.parentElement;
 
     // Abrir/cerrar menú de filtros
     localizacionHeader.addEventListener('click', function(e) {
         if (localizacionHeader.classList.contains('disabled')) return;
-        localizacionOptions.classList.toggle('open');
+            localizacionMultiSelect.classList.toggle('open');
     });
 
     // Cerrado al hacer click fuera
     document.addEventListener('click', function(e) {
         if (!localizacionHeader.contains(e.target) && !localizacionOptions.contains(e.target)) {
-            localizacionOptions.classList.remove('open');
+            localizacionMultiSelect.classList.remove('open');
         }
     });
 
@@ -956,17 +968,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const zonaOptions = document.getElementById('zonavigilada-options');
     const zonaPills = document.getElementById('zonavigilada-pills');
     const zonaCheckboxes = zonaOptions.querySelectorAll('input[type="checkbox"]');
+    const zonaMultiSelect = zonaOptions.parentElement;
 
     // Abrir/cerrar menú de filtros
     zonaHeader.addEventListener('click', function(e) {
         if (zonaHeader.classList.contains('disabled')) return;
-        zonaOptions.classList.toggle('open');
+            zonaMultiSelect.classList.toggle('open');
     });
 
     // Cerrado al hacer click fuera
     document.addEventListener('click', function(e) {
         if (!zonaHeader.contains(e.target) && !zonaOptions.contains(e.target)) {
-            zonaOptions.classList.remove('open');
+            zonaMultiSelect.classList.remove('open');
         }
     });
 
@@ -1009,17 +1022,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const riesgoOptions = document.getElementById('riesgo-options');
     const riesgoPills = document.getElementById('riesgo-pills');
     const riesgoCheckboxes = riesgoOptions.querySelectorAll('input[type="checkbox"]');
+    const riesgoMultiSelect = riesgoOptions.parentElement;
 
     // Abrir/cerrar menú de filtros
     riesgoHeader.addEventListener('click', function(e) {
         if (riesgoHeader.classList.contains('disabled')) return;
-        riesgoOptions.classList.toggle('open');
+            riesgoMultiSelect.classList.toggle('open');
     });
 
     // Cerrado al hacer click fuera
     document.addEventListener('click', function(e) {
         if (!riesgoHeader.contains(e.target) && !riesgoOptions.contains(e.target)) {
-            riesgoOptions.classList.remove('open');
+            riesgoMultiSelect.classList.remove('open');
         }
     });
 
@@ -1061,17 +1075,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const intervencionOptions = document.getElementById('intervencion-options');
     const intervencionPills = document.getElementById('intervencion-pills');
     const intervencionCheckboxes = intervencionOptions.querySelectorAll('input[type="checkbox"]');
+    const intervencionMultiSelect = intervencionOptions.parentElement;
 
     // Abrir/cerrar menú de filtros
     intervencionHeader.addEventListener('click', function(e) {
         if (intervencionHeader.classList.contains('disabled')) return;
-        intervencionOptions.classList.toggle('open');
+            intervencionMultiSelect.classList.toggle('open');
     });
 
     // Cerrado al hacer click fuera
     document.addEventListener('click', function(e) {
         if (!intervencionHeader.contains(e.target) && !intervencionOptions.contains(e.target)) {
-            intervencionOptions.classList.remove('open');
+            intervencionMultiSelect.classList.remove('open');
         }
     });
 
@@ -1244,4 +1259,157 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // Botón para limpiar filtros
+    const clearKmeans = document.getElementById('btn-limpiar-kmeans');
+    clearKmeans.addEventListener('click', function() {
+        document.getElementById('anio-inicio-kmeans').value = '';
+        document.getElementById('anio-fin-kmeans').value = '';
+    });
+
+    // Botón para generar los kmeans
+    const btnKmeans = document.getElementById('btn-generar-kmeans');
+    btnKmeans.addEventListener('click', function() {
+        const anioInicio = document.getElementById('anio-inicio-kmeans').value;
+        const anioFin = document.getElementById('anio-fin-kmeans').value;
+
+        const formData = new FormData();
+        formData.append('anio-inicio-kmeans', anioInicio);
+        formData.append('anio-fin-kmeans', anioFin);
+
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        fetch('/generar_kmeans/', {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-CSRFToken': csrftoken }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('grafica-container');
+            container.innerHTML = '';
+            if (data.grafica_html) {
+                container.innerHTML = data.grafica_html;
+                container.querySelectorAll('script').forEach(script => {
+                    const newScript = document.createElement('script');
+                    if (script.src) {
+                        newScript.src = script.src;
+                    } else {
+                        newScript.text = script.textContent;
+                    }
+                    document.body.appendChild(newScript);
+                    script.parentNode.removeChild(script);
+                });
+            } else if (data.error) {
+                container.innerHTML = `<div class="error">${data.error}</div>`;
+            }
+        });
+    });
+
+
+    // Variables DOM para multiselect ejemplo (por ejemplo, para "intervencion")
+    const dtHeader = document.getElementById('tree-header');
+    const dtOptions = document.getElementById('tree-options');
+    const dtPills = document.getElementById('tree-pills');
+    const dtCheckboxes = dtOptions.querySelectorAll('input[type="checkbox"]');
+    const dtMultiSelect = dtOptions.parentElement;
+
+    // Abrir/cerrar menú de multiselect
+    dtHeader.addEventListener('click', function(e) {
+        if (dtHeader.classList.contains('disabled')) return;
+        dtMultiSelect.classList.toggle('open');
+    });
+
+    // Cerrar menú al hacer click fuera
+    document.addEventListener('click', function(e) {
+        if (!dtHeader.contains(e.target) && !dtOptions.contains(e.target)) {
+            dtMultiSelect.classList.remove('open');
+        }
+    });
+
+    // Actualizar visualización de pills con variables seleccionadas
+    function updateDTPills() {
+        dtPills.innerHTML = '';
+        const selected = [];
+        dtCheckboxes.forEach(cb => {
+            if (cb.checked && cb.value !== '') {
+                selected.push(cb.value);
+                const pill = document.createElement('span');
+                pill.className = 'pill';
+                pill.textContent = cb.parentElement.textContent.trim();
+                const remove = document.createElement('span');
+                remove.className = 'pill-remove';
+                remove.textContent = '×';
+                remove.onclick = () => {
+                    cb.checked = false;
+                    updateDTPills();
+                };
+                pill.appendChild(remove);
+                dtPills.appendChild(pill);
+            }
+        });
+        dtHeader.textContent = selected.length > 0 ? `${selected.length} seleccionada(s)` : 'Selecciona filtro';
+    }
+
+    // Evento para actualizar pills al cambiar la selección
+    dtCheckboxes.forEach(cb => cb.addEventListener('change', updateDTPills));
+
+    // Inicializamos la visualización al cargar
+    updateDTPills();
+
+    // Botón para limpiar filtros del Decision Tree
+    const clearDTFilters = document.getElementById('btn-limpiar-tree');
+    clearDTFilters.addEventListener('click', function() {
+        dtCheckboxes.forEach(cb => cb.checked = false);
+        updateDTPills();
+    });
+
+    // Botón para generar el árbol de decisión con variables seleccionadas
+    const btnGenerarDT = document.getElementById('btn-generar-tree');
+    btnGenerarDT.addEventListener('click', function() {
+        const selectedVars = [];
+        dtCheckboxes.forEach(cb => {
+            if (cb.checked && cb.value !== '') {
+                selectedVars.push(cb.value);
+            }
+        });
+
+        if (selectedVars.length === 0) {
+            alert("Por favor selecciona al menos una variable para generar el árbol.");
+            return;
+        }
+
+        // Preparar datos para enviar
+        const payload = { variables: selectedVars };
+
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        fetch('/generar_tree/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('grafica-container');
+            container.innerHTML = '';
+            if (data.grafica_html) {
+                container.innerHTML = data.grafica_html;
+                container.querySelectorAll('script').forEach(script => {
+                    const newScript = document.createElement('script');
+                    if (script.src) {
+                        newScript.src = script.src;
+                    } else {
+                        newScript.text = script.textContent;
+                    }
+                    document.body.appendChild(newScript);
+                    script.parentNode.removeChild(script);
+                });
+            } else if (data.error) {
+                container.innerHTML = `<div class="error">${data.error}</div>`;
+            }
+        });
+    });
+
 });

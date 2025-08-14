@@ -11,5 +11,7 @@ urlpatterns = [
     path('generar_radar/', views.generar_radar, name='generar_radar'),
     path('comparativa_sklearn/', views.comparativa_sklearn, name='comparativa_sklearn'),
     path('generar_mapa_hotspots/', views.generar_mapa_hotspots, name='generar_mapa_hotspots'),
+    path('generar_kmeans/', views.generar_kmeans, name='generar_kmeans'),
+    path('generar_tree/', views.generar_tree, name='generar_tree'),
     path('', views.home),
 ]

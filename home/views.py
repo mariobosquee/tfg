@@ -6,14 +6,15 @@ from .models import Victima
 from .utils import obtener_codigo
 import plotly as plotly
 import pandas as pd
-from bokeh.models import ColumnDataSource, LabelSet, HoverTool, Label, GeoJSONDataSource, ColorBar, BasicTicker, PrintfTickFormatter
-from bokeh.palettes import Category20c
+from bokeh.models import ColumnDataSource, LabelSet, HoverTool, Label, GeoJSONDataSource, ColorBar, BasicTicker, PrintfTickFormatter, CategoricalColorMapper, Whisker, Div
+from bokeh.palettes import Category20c, Category10
 from bokeh.transform import cumsum, factor_cmap, linear_cmap
 from bokeh.plotting import figure
 from bokeh.embed import components
 from bokeh.resources import CDN
 from bokeh.transform import dodge
 import numpy as np
+import json
 from scipy.interpolate import make_interp_spline
 import geopandas as gpd
 from bokeh.palettes import Reds256
@@ -24,7 +25,14 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.decomposition import PCA
 from datetime import datetime
-from sklearn.cluster import DBSCAN
+from sklearn.cluster import DBSCAN, KMeans
+from sklearn import tree as sktree
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+import io
+import base64
+import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')
 
 
 def home(request):
@@ -1050,4 +1058,225 @@ def generar_mapa_hotspots(request):
 
     return JsonResponse({'html': html_response, 'clusters': summary.to_dict(orient="records")})
 
+@csrf_exempt
+def generar_kmeans(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Método no permitido.'})
 
+    try:
+        anio_inicio = request.POST.get('anio-inicio-kmeans')
+        anio_fin = request.POST.get('anio-fin-kmeans')
+        k = request.POST.get('num_clusters', 3)
+        k = int(k) if k else 3
+
+        if not anio_inicio or not anio_fin:
+            return JsonResponse({'error': 'Debes seleccionar año inicial y final.'})
+        if anio_inicio == anio_fin:
+            return JsonResponse({'error': 'Debes seleccionar un rango de mínimo dos años.'})
+        anio_inicio = int(anio_inicio)
+        anio_fin = int(anio_fin)
+        if anio_inicio > anio_fin:
+            return JsonResponse({'error': 'El año inicial debe ser menor o igual que el final.'})
+
+        # Extraer datos: ahogamientos por año y mes
+        qs = (
+            Victima.objects
+            .filter(incidente__fecha__year__gte=anio_inicio,
+                    incidente__fecha__year__lte=anio_fin)
+            .values('incidente__fecha__year', 'incidente__fecha__month')
+            .annotate(num_ahogamientos=Count('codvictima'))
+        )
+
+        df = pd.DataFrame(list(qs))
+        if df.empty:
+            return JsonResponse({'error': 'No hay datos para esos filtros.'})
+
+        meses = [
+            'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+            'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+        ]
+        df['mes_nom'] = df['incidente__fecha__month'].apply(lambda x: meses[x - 1])
+
+        # Clustering sobre la mediana por mes
+        median_por_mes = df.groupby('mes_nom')['num_ahogamientos'].median().reindex(meses)
+        X = median_por_mes.values.reshape(-1, 1)
+        kmeans = KMeans(n_clusters=k, random_state=42)
+        cluster_labels = kmeans.fit_predict(X)
+        # Asigna cluster por mes en orden calendario
+        df_clusters = pd.DataFrame({'mes_nom': meses, 'cluster': cluster_labels})
+
+        # Estadísticos para boxplot
+        stats = df.groupby('mes_nom')['num_ahogamientos'].describe(percentiles=[.25, .5, .75])
+        stats = stats.reindex(meses)
+        stats = stats.reset_index().merge(df_clusters, on='mes_nom')
+
+        # Colores por cluster
+        palette = Category10[10]
+        stats['color'] = [palette[c % len(palette)] for c in stats['cluster']]
+
+        # Fuente Bokeh
+        source = ColumnDataSource(data=dict(
+            mes=stats['mes_nom'],
+            lower=stats['min'],
+            q1=stats['25%'],
+            median=stats['50%'],
+            q3=stats['75%'],
+            upper=stats['max'],
+            color=stats['color'],
+            cluster=stats['cluster']
+        ))
+
+        p = figure(x_range=meses, height=450, width=900,
+                   title=f'Distribución mensual de ahogamientos ({anio_inicio} - {anio_fin}) con Clustering K-Means',
+                   y_axis_label='Número de ahogamientos',
+                   tools="save,reset,hover", toolbar_location="above")
+
+        # Bigotes
+        p.segment('mes', 'upper', 'mes', 'q3', source=source, line_width=2, color="black")
+        p.segment('mes', 'lower', 'mes', 'q1', source=source, line_width=2, color="black")
+
+        # Cajas coloreadas por cluster
+        p.vbar('mes', 0.7, 'q1', 'q3', source=source, fill_color='color', line_color="black", legend_field='cluster', alpha=0.7)
+
+        # Mediana
+        p.segment('mes', 'median', 'mes', 'median', source=source, line_width=4, color="black")
+
+        # Bigotes con cabezas
+        whisker = Whisker(base="mes", upper="upper", lower="lower", source=source)
+        whisker.upper_head.size=10
+        whisker.lower_head.size=10
+        p.add_layout(whisker)
+
+        # Tooltip
+        p.hover.tooltips = [
+            ("Mes", "@mes"),
+            ("Cluster", "@cluster"),
+            ("Mínimo", "@lower"),
+            ("Q1", "@q1"),
+            ("Mediana", "@median"),
+            ("Q3", "@q3"),
+            ("Máximo", "@upper"),
+        ]
+
+        p.legend.location = "top_left"
+        p.legend.title = "Clusters"
+        p.legend.orientation = "horizontal"
+        p.xgrid.grid_line_color = None
+        p.ygrid.grid_line_color = "gray"
+        p.ygrid.grid_line_dash = "dotted"
+        p.y_range.start = 0
+
+        script, div = components(p)
+        resources = CDN.render()
+
+        return JsonResponse({'grafica_html': f"{resources}\n{script}\n{div}"})
+
+    except Exception as e:
+        return JsonResponse({'error': f'Error en procesamiento: {str(e)}'})
+    
+@csrf_exempt
+def generar_tree(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Método no permitido.'})
+
+    try:
+        body_data = json.loads(request.body.decode('utf-8'))
+        selected_vars = body_data.get('variables', [])
+
+        if not selected_vars or not (2 <= len(selected_vars) <= 3):
+            return JsonResponse({'error': 'Debes seleccionar entre 2 y 3 variables.'})
+
+        MAPEO_FILTROS_ARBOL = {
+            "deteccion_socorrista": "incidente__deteccion__nombredeteccion",
+            "mayor_65": "edad",
+            "meteo_buena": "incidente__riesgo__nombreriesgo",
+            "es_playa": "incidente__localizacion__nombrelocalizacion",
+            "zona_vigilada": "incidente__zona__nombrezonavigilada",
+            "rcp_aplicada": "reanimacion__nombrereanimacion",
+            "discapacidad_fisica": "antecedentevictima__antecedente__nombreantecedente"
+        }
+
+        CONDICIONES_TRUE = {
+            "deteccion_socorrista": ["Socorrista en servicio", "Socorrista no en servicio"],
+            "mayor_65": None,
+            "meteo_buena": [
+                "Excelentes condiciones, entornos cerrados o cubiertos",
+                "Buenas condiciones metereológicas o del agua (Bandera Verde)"
+            ],
+            "es_playa": ["Playas con vigilancia", "Playas sin vigilancia"],
+            "zona_vigilada": ["En horario de vigilancia"],
+            "rcp_aplicada": [
+                "RCP basica SOS y SVA por SEM",
+                "RCP temprana por transeuntes no adiestrados",
+                "RCP basica temprana por transeunte adiestrado"
+            ],
+            "discapacidad_fisica": ["Discapacidad física"]
+        }
+
+        valid_vars = [v for v in selected_vars if v in MAPEO_FILTROS_ARBOL]
+        if len(valid_vars) < 2:
+            return JsonResponse({'error': 'Variables no válidas o insuficientes.'})
+
+        campos = [MAPEO_FILTROS_ARBOL[v] for v in valid_vars]
+        target_var = 'pronostico__nombrepronostico'
+
+        from .models import Victima
+        consulta_campos = campos + [target_var]
+        df = pd.DataFrame(list(Victima.objects.values(*consulta_campos)))
+
+        if df.empty:
+            return JsonResponse({'error': 'No hay datos para las variables seleccionadas.'})
+
+        # Variable target binaria (1 = mortal, 0 = no mortal)
+        df['target'] = (df[target_var] == 'Ahogamiento mortal').astype(int)
+
+        # Procesamos variables a binarias invirtiendo la condición como me pediste
+        processed = pd.DataFrame()
+        for var in valid_vars:
+            col = MAPEO_FILTROS_ARBOL[var]
+            valores_true = CONDICIONES_TRUE[var]
+            if var == "mayor_65":
+                processed[var] = (~(pd.to_numeric(df[col], errors='coerce').fillna(0) >= 65)).astype(int)
+            else:
+                processed[var] = (~df[col].fillna('').isin(valores_true)).astype(int)
+
+        # Entrenamos el árbol con profundidad igual al número de variables
+        clf = DecisionTreeClassifier(max_depth=len(valid_vars), random_state=42)
+        clf.fit(processed.values, df['target'].values)
+
+        # Generar imagen gráfica con plot_tree
+        fig, ax = plt.subplots(figsize=(12, 6))
+        plot_tree(
+            clf,
+            feature_names=valid_vars,
+            class_names=['No Mortal', 'Mortal'],
+            filled=True,
+            rounded=True,
+            fontsize=10,
+            ax=ax
+        )
+        plt.tight_layout()
+
+        buf = io.BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
+        image_base64 = base64.b64encode(buf.read()).decode('utf-8')
+        buf.close()
+        plt.close(fig)
+
+        # Crear componente Bokeh con la imagen para embebido
+        div_html = Div(text=f"""
+            <div style='background:#ecf0f4; border-radius:12px; padding:18px;
+                        font-family: monospace; font-size: 15px; color: #333;'>
+                <img src="data:image/png;base64,{image_base64}" style="max-width:100%;"/>
+            </div>
+        """, width=900, height=700)
+
+        script, div = components(div_html)
+        resources = CDN.render()
+        grafica_html = f"{resources}\n{script}\n{div}"
+
+        return JsonResponse({'grafica_html': grafica_html})
+
+    except Exception as e:
+        return JsonResponse({'error': f'Error en procesamiento: {str(e)}'})
