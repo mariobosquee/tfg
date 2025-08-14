@@ -5,6 +5,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Prevención de Ahogamientos - Home</title>
+  <!-- Carga estilos y scripts necesarios-->
   <link rel="stylesheet" href="https://cdn.bokeh.org/bokeh/release/bokeh-3.7.3.min.css">
   <script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.7.3.min.js"></script>
   <script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-3.7.3.min.js"></script>
@@ -12,10 +13,13 @@
   <script src="https://cdn.plot.ly/plotly-3.0.0.min.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <!-- Carga scripts y estilos propios con versionado para evitar caché -->
   <script src="{% static 'styles/home.js' %}?v={{ now|date:'U' }}"></script>
   <link rel="stylesheet" href="{% static 'styles/home.css' %}?v={{ now|date:'U' }}">
 </head>
+
 <body>
+  <!-- Encabezado con título, subtítulo y descripción -->
   <header>
     <h1>Prevención de Ahogamientos</h1>
     <p class="subtitulo">El cambio empieza con la concienciación</p>
@@ -23,11 +27,17 @@
       Expertos y referencia científica en Ahogamientos en España. Un proyecto de investigación promovido por la Escuela Segoviana de Socorrismo.
     </p>
   </header>
+  <!-- Espacio vertical de separación -->
   <div style="height: 56px;"></div>
+
+  <!-- Contenedor principal con diseño flexible -->
   <div class="layout-flex">
+
+    <!-- Panel lateral para selección del tipo de gráfica -->
     <div class="selector-graficas">
       <h3>Selecciona tipo de gráfica</h3>
       <ul>
+        <!-- Botones para cambiar entre distintos tipos de gráficas -->
         <li><button id="btn-grafica-apilada" type="button" class="active">Gráfica apilada</button></li>
         <li><button id="btn-grafica-circular" type="button">Gráfica circular</button></li>
         <li><button id="btn-grafica-lineas" type="button">Gráfica de líneas</button></li>
@@ -38,8 +48,11 @@
       </ul>
     </div>
 
+    <!-- Contenedor para configuración y visualización de gráficas -->
     <div class="contenedor-grafica">
       <div class="configuracion-grafica" id="configPanel">
+
+        <!-- Panel de filtros para gráfica apilada -->
         <div id="filtros-apilada" class="config-group">
           <label>Comunidades Autónomas:</label>
           <div class="multi-select" id="com-multiselect">
@@ -154,6 +167,7 @@
           </div>
         </div>
 
+        <!-- Panel de filtros para gráfica circular (oculto por defecto) -->
         <div id="filtros-circular" class="config-group" style="display:none;">
           <label for="select-nacionalidad">Nacionalidad:</label>
           <div class="multi-select" id="nacionalidad-multiselect">
@@ -244,7 +258,6 @@
                   <div class="multi-select-option"><input type="checkbox" value="Senegal">Senegal</div>
                   <div class="multi-select-option"><input type="checkbox" value="Serbia">Serbia</div>
                   <div class="multi-select-option"><input type="checkbox" value="Singapur">Singapur</div>
-                  <div class="multi-select-option"><input type="checkbox" value="Sin datos">Sin datos</div>
                   <div class="multi-select-option"><input type="checkbox" value="Subsahariano">Subsahariano</div>
                   <div class="multi-select-option"><input type="checkbox" value="Sudáfrica">Sudáfrica</div>
                   <div class="multi-select-option"><input type="checkbox" value="Sudamérica">Sudamérica</div>
@@ -273,6 +286,7 @@
           </div>
         </div>
 
+        <!-- Panel filtro para gráfica líneas (oculto por defecto) -->
         <div id="filtros-lineas" class="config-group" style="display:none;">
             <label for="anio-linea">Año:</label>
             <input type="number" id="anio-lineas" min="2013" placeholder="Ej: 2015">
@@ -289,6 +303,7 @@
           </div>
         </div>
 
+        <!-- Panel filtro para diagrama de dispersión (oculto por defecto) -->
         <div id="filtros-dispersion" class="config-group" style="display:none;">
           <label class="switch-label">
             <input type="checkbox" id="color-sexo-switch-dispersion">
@@ -314,6 +329,7 @@
           </div>
         </div>
 
+        <!-- Panel filtro para mapa (oculto por defecto) -->
         <div id="filtros-mapa" class="config-group" style="display:none;">
           <label for="select-lugar">Lugar:</label>
           <div class="multi-select" id="lugar-multiselect">
@@ -341,6 +357,7 @@
           </div>
         </div>
 
+        <!-- Panel filtro para histograma (oculto por defecto) -->
         <div id="filtros-histograma" class="config-group" style="display:none;">
           <label for="select-dia">Día de la semana:</label>
           <div class="multi-select" id="dia-multiselect">
@@ -370,6 +387,7 @@
           </div>
         </div>
 
+        <!-- Panel filtro para radar (oculto por defecto) -->
         <div id="filtros-radar" class="config-group" style="display:none;">
           <label for="select-radar">Filtro a analizar:</label>
           <div class="multi-select" id="filtro-multiselect">
@@ -400,6 +418,7 @@
           </div>
         </div>
 
+        <!-- Panel filtro para analisis automático (oculto por defecto) -->
         <div id="filtros-analisis-auto" class="config-group" style="display:none;">
           <label>Actividad:</label>
           <div class="multi-select" id="actividad-multiselect">
@@ -476,6 +495,7 @@
           </div>
         </div>
 
+        <!-- Panel filtro para hotspots (oculto por defecto) -->
         <div id="filtros-hotspots" class="config-group" style="display:none;">
           <label for="anio-inicio-hotspots">Año inicio:</label>
           <input type="number" id="anio-inicio-hotspots" min="2013" placeholder="Ej: 2015">
@@ -489,6 +509,7 @@
           </div>
         </div>
 
+        <!-- Panel filtro para kmeans (oculto por defecto) -->
         <div id="filtros-kmeans" class="config-group" style="display:none;">
           <label for="anio-inicio-kmeans">Año inicio:</label>
           <input type="number" id="anio-inicio-kmeans" min="2013" placeholder="Ej: 2015">
@@ -502,6 +523,7 @@
           </div>
         </div>
 
+        <!-- Panel filtro para el diagrama de árbol (oculto por defecto) -->
         <div id="filtros-tree" class="config-group" style="display:none;">
           <label for="select-tree">Filtro a analizar:</label>
           <div class="multi-select" id="tree-multiselect">
@@ -524,10 +546,12 @@
           </div>
         </div>
 
+        <!-- Contenedor donde se mostrará la gráfica generada -->
         <div id="grafica-container"></div>
       </div>     
     </div>
     
+    <!-- Selector para tipo de consulta o análisis -->
     <div class="selector-graficas">
       <h3>Selecciona tipo de consulta</h3>
       <ul>
@@ -536,9 +560,7 @@
         <li><button id="btn-kmeans" type="button">Análisis mensual</button></li>
         <li><button id="btn-tree" type="button">Árbol de decisión</button></li>
       </ul>
-    </div>
-
-    
+    </div>    
   </div>
 </body>
 </html>
